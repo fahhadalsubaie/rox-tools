@@ -257,15 +257,24 @@ const TIER_EXP = {
   'Pront':1,'Izlude':1,'Morroc':2,'Alberta':4,'Payon':8,'Geffen':16,'Glast Heim':32
 };
 
-// Equipment-type multipliers relative to 2H Weapon baseline (1.0)
+// Equipment-type ratios relative to 2H Weapon (1.0).
+// The spreadsheet LVL_EXP values use Off Hand/Armor/Accessory as baseline (ratio 1/3).
 const ENCHANT_RATIOS = {
-  '2 Hand':    1,      // 100% — baseline
+  '2 Hand':    1,      // 100%
   '1 Hand':    2/3,    // 66.7%
   'Dagger':    1/2,    // 50%
-  'Off Hand':  1/3,    // 33.3%
-  'Armor':     1/3,    // 33.3%
-  'Accessory': 1/3,    // 33.3%
+  'Off Hand':  1/3,    // 33.3% — spreadsheet baseline
+  'Armor':     1/3,    // 33.3% — spreadsheet baseline
+  'Accessory': 1/3,    // 33.3% — spreadsheet baseline
 };
+
+// EXP scale relative to the spreadsheet baseline (Off Hand/Armor/Accessory = ×1).
+// Derived: ENCHANT_RATIOS[eq] / ENCHANT_RATIOS['Off Hand']
+// Result:  Off Hand/Armor/Accessory=1, Dagger=1.5, 1H=2, 2H=3
+const BASE_RATIO = ENCHANT_RATIOS['Off Hand']; // 1/3
+const EXP_SCALE  = Object.fromEntries(
+  EQUIP_TYPES.map(eq => [eq, ENCHANT_RATIOS[eq] / BASE_RATIO])
+);
 
 // Base materials per attempt for 2H Weapon; all other types scale via ENCHANT_RATIOS
 const BASE_ATT = { pront: 90, other: 6 };
@@ -342,10 +351,10 @@ function toggleTheme() { applyLight(!document.body.classList.contains('light'));
 
 // ── Calculation ───────────────────────────────────────────────────────────────
 
-// Effective EXP for an equipment type — LVL_EXP values are the 2H baseline;
-// all other types scale down by ENCHANT_RATIOS.
+// Effective EXP for an equipment type — LVL_EXP values are the Off Hand/Armor/Accessory
+// baseline; weapon types scale UP by EXP_SCALE (Off Hand=×1, Dagger=×1.5, 1H=×2, 2H=×3).
 function getEffectiveEXP(eq, reqExp) {
-  return reqExp * ENCHANT_RATIOS[eq];
+  return reqExp * EXP_SCALE[eq];
 }
 
 // Materials needed to gain effectiveEXP at a given city.
