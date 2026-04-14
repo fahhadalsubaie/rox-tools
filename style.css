@@ -76,10 +76,18 @@ select:focus{outline:none;border-color:var(--gold)}
 .mode-tab+.mode-tab{border-left:1px solid var(--border)}
 .mode-tab.active{background:var(--surface2);color:var(--text)}
 
+/* ── Weapon Sub-Selector ──────────────────────────────────────────────────── */
+.weapon-sub-wrap{display:flex;flex-direction:column;gap:.45rem;margin-top:.55rem;padding:.7rem .85rem;background:var(--surface2);border:1px solid var(--border);border-radius:9px;transition:background .2s,border-color .2s}
+.weapon-sub-label{font-size:.65rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.cheapest-tag{display:inline-block;font-size:.55rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;background:var(--green);color:#081a10;padding:.08rem .32rem;border-radius:999px;margin-left:.3rem;vertical-align:middle;line-height:1.4}
+.btn.active .cheapest-tag{background:rgba(0,0,0,0.25);color:rgba(255,255,255,.9)}
+.weapon-share-note{font-size:.69rem;color:var(--muted);font-style:italic;line-height:1.55;margin-top:.1rem}
+
 /* ── Range Label ──────────────────────────────────────────────────────────── */
 .range-label{font-size:.78rem;color:var(--muted);margin-bottom:1.1rem;display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
 .range-label strong{color:var(--text)}
 .range-sep{color:var(--border);margin:0 .1rem}
+.range-equip-detail{font-weight:400;color:var(--muted);font-size:.75em}
 
 /* ── Optimal Mix Card ─────────────────────────────────────────────────────── */
 .mix-card{background:var(--surface2);border:1px solid var(--green-dim);border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.25rem;display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center}
