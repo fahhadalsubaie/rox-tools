@@ -186,11 +186,11 @@
           <tr><td>Off Hand</td><td>30</td><td>2</td></tr>
           <tr><td>1 Hand</td><td>60</td><td>4</td></tr>
           <tr><td>2 Hand</td><td>90</td><td>6</td></tr>
-          <tr><td>Armor</td><td>30</td><td>2 *</td></tr>
-          <tr><td>Accessory</td><td>30</td><td>2 *</td></tr>
+          <tr><td>Armor</td><td>30</td><td>2</td></tr>
+          <tr><td>Accessory</td><td>30</td><td>2</td></tr>
         </tbody>
       </table>
-      <p class="price-note">* Armor &amp; Accessory assumed 2 stones/attempt for non-Prontera cities (matches original spreadsheet data).</p>
+      <p class="price-note">Values shown are per-attempt material costs. Armor &amp; Accessory share the same total EXP requirement as 2H Weapon (same enchant table), but require fewer materials per attempt and more attempts to reach the same EXP.</p>
     </div>
   </div>
 
@@ -252,39 +252,30 @@ const NON_PRONT = ['Izlude','Morroc','Alberta','Payon','Geffen','Glast Heim'];
 const EQUIP_TYPES = ['Dagger','Off Hand','1 Hand','2 Hand','Armor','Accessory'];
 const WEAPON_TYPES = new Set(['Dagger','Off Hand','1 Hand','2 Hand']);
 
-// How many EXP points one attempt grants per city tier
-const TIER_EXP = {
-  'Pront':1,'Izlude':1,'Morroc':2,'Alberta':4,'Payon':8,'Geffen':16,'Glast Heim':32
-};
-
-// Equipment-type ratios relative to 2H Weapon (1.0).
-// The spreadsheet LVL_EXP values use Off Hand/Armor/Accessory as baseline (ratio 1/3).
+// Equipment-type EXP ratios relative to 2H Weapon baseline (1.0).
+// 2H / Armor / Accessory share the same EXP table (all ratio 1.0).
+// Verified: lv1→2 Pront costs — 2H=300 Musp, Armor=300, Acc=300, 1H=200, Dagger=150, OffHand=100.
 const ENCHANT_RATIOS = {
-  '2 Hand':    1,      // 100%
+  '2 Hand':    1,      // baseline
   '1 Hand':    2/3,    // 66.7%
   'Dagger':    1/2,    // 50%
-  'Off Hand':  1/3,    // 33.3% — spreadsheet baseline
-  'Armor':     1/3,    // 33.3% — spreadsheet baseline
-  'Accessory': 1/3,    // 33.3% — spreadsheet baseline
+  'Off Hand':  1/3,    // 33.3%
+  'Armor':     1,      // same table as 2H
+  'Accessory': 1,      // same table as 2H
 };
 
-// EXP scale relative to the spreadsheet baseline (Off Hand/Armor/Accessory = ×1).
-// Derived: ENCHANT_RATIOS[eq] / ENCHANT_RATIOS['Off Hand']
-// Result:  Off Hand/Armor/Accessory=1, Dagger=1.5, 1H=2, 2H=3
-const BASE_RATIO = ENCHANT_RATIOS['Off Hand']; // 1/3
-const EXP_SCALE  = Object.fromEntries(
-  EQUIP_TYPES.map(eq => [eq, ENCHANT_RATIOS[eq] / BASE_RATIO])
-);
-
-// Base materials per attempt for 2H Weapon; all other types scale via ENCHANT_RATIOS
-const BASE_ATT = { pront: 90, other: 6 };
-
-// Derived lookup: materials per attempt by city group and equipment type
-// Pront: 2H=90, 1H=60, Dagger=45, Off Hand/Armor/Accessory=30
-// Other: 2H=6,  1H=4,  Dagger=3,  Off Hand/Armor/Accessory=2
-const ATT = {
-  pront: Object.fromEntries(EQUIP_TYPES.map(eq => [eq, BASE_ATT.pront * ENCHANT_RATIOS[eq]])),
-  other: Object.fromEntries(EQUIP_TYPES.map(eq => [eq, BASE_ATT.other * ENCHANT_RATIOS[eq]])),
+// Material units required per EXP point, per city.
+// Prontera uses Muspellium (raw); all others use Crafted Enchant Stones.
+// Derived from: Pront 2H needs 300 Musp for 10 EXP → 30/EXP.
+// Izlude 2H needs 6 stones for 10 EXP... etc — each city tier halves the rate.
+const STONES_PER_EXP = {
+  'Pront':      30,
+  'Izlude':      2,
+  'Morroc':      1,
+  'Alberta':     0.5,
+  'Payon':       0.25,
+  'Geffen':      0.125,
+  'Glast Heim':  0.0625,
 };
 
 // Level EXP requirements (incremental)
@@ -351,12 +342,10 @@ function toggleTheme() { applyLight(!document.body.classList.contains('light'));
 
 // ── Calculation ───────────────────────────────────────────────────────────────
 
-// Materials needed to reach reqExp at a given city.
-// All equipment types need the same number of attempts (= reqExp).
-// The ENCHANT_RATIOS are already encoded in ATT (per-attempt cost only).
+// Total materials to accumulate reqExp at a given city.
+// Formula: EXP_needed × type_ratio × stones_per_exp
 function getMat(city, eq, reqExp) {
-  const attCost = city === 'Pront' ? ATT.pront[eq] : ATT.other[eq];
-  return reqExp * attCost / TIER_EXP[city];
+  return reqExp * ENCHANT_RATIOS[eq] * STONES_PER_EXP[city];
 }
 
 // Price per unit of material (Muspellium or stone)
