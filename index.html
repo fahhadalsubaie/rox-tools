@@ -5,329 +5,147 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ROX Next Gen — Enchant Cost Calculator</title>
   <style>
-    /* ── Themes ── */
     :root {
-      --bg:        #0d0d18;
-      --surface:   #14142a;
-      --surface2:  #1c1c36;
-      --border:    #2a2a50;
-      --accent:    #e94560;
-      --gold:      #f5c842;
-      --gold-dim:  #a88a20;
-      --green:     #4cde8f;
-      --green-dim: #1a5535;
-      --text:      #dde0f0;
-      --muted:     #6b7099;
-      --warn:      #f5a623;
-      --row-hover: rgba(128,128,255,0.04);
-      --row-div:   rgba(42,42,80,0.4);
+      --bg:#0d0d18;--surface:#14142a;--surface2:#1c1c36;--border:#2a2a50;
+      --accent:#e94560;--gold:#f5c842;--gold-dim:#a88a20;
+      --green:#4cde8f;--green-dim:#1a5535;
+      --text:#dde0f0;--muted:#6b7099;--warn:#f5a623;
+      --hover:rgba(128,128,255,0.04);--divider:rgba(42,42,80,0.4);
     }
-
     body.light {
-      --bg:        #f2f3fa;
-      --surface:   #ffffff;
-      --surface2:  #e8eaf5;
-      --border:    #ced1e8;
-      --gold:      #9a6e00;
-      --gold-dim:  #7a5500;
-      --green:     #1a7a45;
-      --green-dim: #0d5030;
-      --text:      #1a1a30;
-      --muted:     #7878a0;
-      --row-hover: rgba(0,0,80,0.03);
-      --row-div:   rgba(180,180,220,0.5);
+      --bg:#f2f3fa;--surface:#fff;--surface2:#e8eaf5;--border:#ced1e8;
+      --gold:#9a6e00;--gold-dim:#7a5500;--green:#1a7a45;--green-dim:#0d5030;
+      --text:#1a1a30;--muted:#7878a0;
+      --hover:rgba(0,0,80,0.03);--divider:rgba(180,180,220,0.5);
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;transition:background .2s,color .2s}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Header */
+    header{background:linear-gradient(135deg,#0a0a1a,#1c1c3a);border-bottom:2px solid var(--accent);padding:1.5rem 2rem;text-align:center;position:relative}
+    header h1{font-size:1.75rem;font-weight:800;letter-spacing:3px;color:#f5c842;text-shadow:0 0 30px rgba(245,200,66,.4)}
+    .hdr-sub{color:#8888aa;margin-top:.3rem;font-size:.85rem;letter-spacing:1px}
+    .hdr-credits{color:#a88a20;margin-top:.55rem;font-size:.78rem}
+    .hdr-credits strong{color:#f5c842}
+    #themeBtn{position:absolute;top:1rem;right:1.2rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#ccd;font-size:.78rem;font-weight:600;padding:.4rem .85rem;cursor:pointer;transition:all .15s}
+    #themeBtn:hover{background:rgba(255,255,255,.16)}
 
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      font-size: 14px;
-      transition: background 0.2s, color 0.2s;
-    }
+    /* Layout */
+    main{max-width:1320px;margin:0 auto;padding:2rem 1.5rem;display:flex;flex-direction:column;gap:1.5rem}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:background .2s,border-color .2s}
+    .card-title{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;padding-bottom:.7rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem}
+    .saved-pill{font-size:.68rem;color:var(--green);margin-left:.5rem;opacity:0;transition:opacity .3s}
+    .saved-pill.show{opacity:1}
 
-    /* ── Header ── */
-    header {
-      background: linear-gradient(135deg, #0a0a1a 0%, #1c1c3a 100%);
-      border-bottom: 2px solid var(--accent);
-      padding: 1.5rem 2rem;
-      text-align: center;
-      position: relative;
-    }
-    header h1 {
-      font-size: 1.75rem; font-weight: 800;
-      letter-spacing: 3px; color: #f5c842;
-      text-shadow: 0 0 30px rgba(245,200,66,0.4);
-    }
-    header .sub  { color: #8888aa; margin-top: 0.3rem; font-size: 0.85rem; letter-spacing: 1px; }
-    header .credits { color: #a88a20; margin-top: 0.55rem; font-size: 0.78rem; }
-    header .credits strong { color: #f5c842; }
+    /* Price table */
+    .prices-wrap{overflow-x:auto}
+    .prices-table{width:100%;border-collapse:collapse;min-width:540px}
+    .prices-table th{background:var(--surface2);color:var(--muted);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.5rem .6rem;text-align:center;transition:background .2s;white-space:nowrap}
+    .prices-table th:first-child{text-align:left}
+    .prices-table td{padding:.35rem .45rem;vertical-align:middle}
+    .prices-table td:first-child{font-weight:600;font-size:.8rem;color:var(--text);white-space:nowrap;padding-left:.2rem}
+    .prices-table .section-row td{background:var(--surface2);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:.4rem .6rem;border-top:2px solid var(--border)}
+    .price-input{width:100%;min-width:72px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:.3rem .45rem;font-size:.8rem;text-align:right;transition:border-color .15s,background .2s;-moz-appearance:textfield}
+    .price-input::-webkit-outer-spin-button,.price-input::-webkit-inner-spin-button{-webkit-appearance:none}
+    .price-input:focus{outline:none;border-color:var(--gold)}
+    .price-input:disabled{opacity:.25;cursor:not-allowed}
+    .price-note{margin-top:.8rem;font-size:.72rem;color:var(--muted);font-style:italic;line-height:1.6}
 
-    #themeBtn {
-      position: absolute; top: 1rem; right: 1.2rem;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 8px; color: #ccccdd;
-      font-size: 0.78rem; font-weight: 600;
-      padding: 0.4rem 0.85rem; cursor: pointer;
-      transition: all 0.15s; letter-spacing: 0.03em;
-    }
-    #themeBtn:hover { background: rgba(255,255,255,0.16); }
+    /* Reference table */
+    .ref-toggle{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:.72rem;padding:.28rem .65rem;cursor:pointer;transition:all .15s;margin-top:.8rem}
+    .ref-toggle:hover{border-color:var(--gold-dim);color:var(--text)}
+    .ref-table{width:100%;border-collapse:collapse;font-size:.75rem;margin-top:.65rem;overflow-x:auto;display:block;max-width:fit-content}
+    .ref-table th{background:var(--surface2);color:var(--muted);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:.4rem .65rem;text-align:center;white-space:nowrap}
+    .ref-table th:first-child{text-align:left}
+    .ref-table td{padding:.35rem .65rem;border-bottom:1px solid var(--divider);text-align:center;color:var(--text)}
+    .ref-table td:first-child{text-align:left;color:var(--muted);font-weight:600}
 
-    /* ── Layout ── */
-    main {
-      max-width: 1320px; margin: 0 auto;
-      padding: 2rem 1.5rem;
-      display: flex; flex-direction: column; gap: 1.5rem;
-    }
+    /* Controls */
+    .controls{display:flex;flex-wrap:wrap;gap:1.5rem;align-items:flex-end}
+    .control-group{display:flex;flex-direction:column;gap:.45rem}
+    .control-label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .btn-group{display:flex;gap:.35rem;flex-wrap:wrap}
+    .btn{padding:.45rem 1rem;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--muted);cursor:pointer;font-size:.83rem;font-weight:600;transition:all .15s}
+    .btn:hover{border-color:var(--gold-dim);color:var(--text)}
+    .btn.active{background:var(--gold);border-color:var(--gold);color:#111}
+    select{background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:.48rem .8rem;font-size:.85rem;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7099' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7rem center;padding-right:2rem;min-width:130px;transition:background-color .2s,border-color .2s}
+    select:focus{outline:none;border-color:var(--gold)}
+    .mode-tabs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .mode-tab{flex:1;padding:.43rem .7rem;background:var(--bg);border:none;color:var(--muted);font-size:.78rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+    .mode-tab+.mode-tab{border-left:1px solid var(--border)}
+    .mode-tab.active{background:var(--surface2);color:var(--text)}
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.5rem;
-      transition: background 0.2s, border-color 0.2s;
-    }
+    /* Range label */
+    .range-label{font-size:.78rem;color:var(--muted);margin-bottom:1.1rem;display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
+    .range-label strong{color:var(--text)}
+    .range-sep{color:var(--border);margin:0 .1rem}
 
-    .card-title {
-      font-size: 0.78rem; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 1.2rem;
-      padding-bottom: 0.7rem; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .card-title .icon { font-size: 1rem; }
+    /* Optimal mix card */
+    .mix-card{background:var(--surface2);border:1px solid var(--green-dim);border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.25rem;display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center}
+    .mix-main{flex:0 0 auto;min-width:160px}
+    .mix-badge{font-size:.6rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;background:var(--green);color:#081a10;padding:.16rem .5rem;border-radius:999px;display:inline-block;margin-bottom:.4rem}
+    .mix-label{font-size:.72rem;color:var(--muted);margin-bottom:.15rem}
+    .mix-cost{font-size:2rem;font-weight:900;color:var(--green);line-height:1.1}
+    .mix-sub{font-size:.7rem;color:var(--muted);margin-top:.25rem}
+    .mix-chips{display:flex;flex-wrap:wrap;gap:.5rem;align-items:flex-start}
+    .mix-chip{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.38rem .6rem;text-align:center;min-width:84px;transition:background .2s}
+    .chip-name{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+    .chip-count{font-size:.86rem;font-weight:700;color:var(--text);margin-top:.12rem}
+    .chip-unit{font-size:.6rem;color:var(--muted);font-weight:400;margin-left:.15rem}
 
-    /* ── Saved pill ── */
-    .saved-pill {
-      font-size: 0.68rem; color: var(--green);
-      margin-left: 0.5rem; opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .saved-pill.show { opacity: 1; }
+    /* Summary cards */
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:.65rem;margin-bottom:1.25rem}
+    .summary-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:.82rem .68rem;text-align:center;transition:border-color .2s,background .2s}
+    .summary-card.cheapest{border-color:var(--green)}
+    .summary-card.no-price{opacity:.35}
+    .badge{font-size:.56rem;font-weight:800;letter-spacing:.1em;background:var(--green);color:#081a10;padding:.1rem .38rem;border-radius:999px;display:inline-block;margin-bottom:.28rem;text-transform:uppercase}
+    .s-city{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .s-cost{font-size:1.1rem;font-weight:800;color:var(--gold);margin:.24rem 0 .1rem;line-height:1}
+    .s-cost.green{color:var(--green)}
+    .s-sub{font-size:.66rem;color:var(--muted)}
 
-    /* ── Price Table ── */
-    .prices-wrap { overflow-x: auto; }
-    .prices-table { width: 100%; border-collapse: collapse; min-width: 640px; }
-    .prices-table th {
-      background: var(--surface2); color: var(--muted);
-      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
-      text-transform: uppercase; padding: 0.55rem 0.7rem; text-align: center;
-      transition: background 0.2s;
-    }
-    .prices-table th:first-child { text-align: left; }
-    .prices-table td { padding: 0.4rem 0.5rem; vertical-align: middle; }
-    .prices-table td:first-child {
-      font-weight: 600; font-size: 0.82rem; color: var(--text);
-      padding-left: 0.2rem; white-space: nowrap;
-    }
+    /* Breakdown table */
+    .table-wrap{overflow-x:auto;margin-top:1.2rem}
+    .breakdown{width:100%;border-collapse:collapse;font-size:.79rem;min-width:500px}
+    .breakdown thead th{background:var(--surface2);color:var(--muted);font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.52rem .65rem;text-align:right;white-space:nowrap;transition:background .2s}
+    .breakdown thead th:first-child,.breakdown thead th:nth-child(2){text-align:left}
+    .breakdown thead th.th-mix{color:var(--green)}
+    .breakdown tbody td{padding:.43rem .65rem;border-bottom:1px solid var(--divider);text-align:right;color:var(--text)}
+    .breakdown tbody td:first-child{text-align:left;font-weight:600;color:var(--muted)}
+    .breakdown tbody td:nth-child(2){text-align:left;color:var(--muted)}
+    .breakdown tbody tr:hover td{background:var(--hover)}
+    .breakdown tfoot td{padding:.52rem .65rem;text-align:right;font-weight:700;border-top:2px solid var(--border);color:var(--gold);font-size:.8rem}
+    .breakdown tfoot td:first-child{text-align:left;text-transform:uppercase;letter-spacing:.05em}
+    .breakdown tfoot td:nth-child(2){text-align:left}
+    .breakdown tfoot td.td-mix{color:var(--green)}
+    .cell-best{color:var(--green);font-weight:700}
+    .cell-na{color:var(--border)}
+    .mix-tag{display:block;font-size:.58rem;color:var(--green);opacity:.75;margin-top:1px}
 
-    .price-input {
-      width: 100%; min-width: 80px;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 6px; color: var(--text);
-      padding: 0.35rem 0.5rem; font-size: 0.82rem;
-      text-align: right; transition: border-color 0.15s, background 0.2s;
-      -moz-appearance: textfield;
-    }
-    .price-input::-webkit-outer-spin-button,
-    .price-input::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .price-input:focus { outline: none; border-color: var(--gold); }
+    /* Stone qty panel */
+    .stones-panel{margin-top:.85rem}
+    .stones-toggle{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:.73rem;padding:.28rem .7rem;cursor:pointer;transition:all .15s}
+    .stones-toggle:hover{border-color:var(--gold-dim);color:var(--text)}
+    .stones-lbl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:1rem 0 .5rem}
+    .stones-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:.5rem}
+    .stone-qty{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.58rem .55rem;text-align:center;transition:background .2s}
+    .stone-qty.hl{border-color:var(--green-dim)}
+    .sq-name{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+    .sq-mat{font-size:.55rem;color:var(--muted);margin-top:.1rem}
+    .sq-qty{font-size:.9rem;font-weight:700;color:var(--text);margin-top:.18rem}
+    .sq-qty.green{color:var(--green)}
 
-    .price-note { margin-top: 0.8rem; font-size: 0.75rem; color: var(--muted); font-style: italic; }
+    /* Misc */
+    .empty{color:var(--muted);font-size:.85rem;padding:1rem 0}
+    .warn{color:var(--warn);font-size:.85rem;padding:.5rem 0}
 
-    /* ── Controls ── */
-    .controls { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; }
-    .control-group { display: flex; flex-direction: column; gap: 0.45rem; }
-    .control-label {
-      font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
-    }
-    .btn-group { display: flex; gap: 0.4rem; }
-
-    .btn {
-      padding: 0.5rem 1.1rem;
-      border: 1px solid var(--border); border-radius: 7px;
-      background: var(--bg); color: var(--muted);
-      cursor: pointer; font-size: 0.85rem; font-weight: 600;
-      transition: all 0.15s;
-    }
-    .btn:hover { border-color: var(--gold-dim); color: var(--text); }
-    .btn.active { background: var(--gold); border-color: var(--gold); color: #111; }
-
-    select {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 7px; color: var(--text);
-      padding: 0.5rem 0.8rem; font-size: 0.85rem; cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7099' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 0.7rem center;
-      padding-right: 2rem; min-width: 130px;
-      transition: background-color 0.2s, border-color 0.2s;
-    }
-    select:focus { outline: none; border-color: var(--gold); }
-
-    /* ── Mode tabs ── */
-    .mode-tabs { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-    .mode-tab {
-      flex: 1; padding: 0.45rem 0.7rem;
-      background: var(--bg); border: none;
-      color: var(--muted); font-size: 0.78rem; font-weight: 600;
-      cursor: pointer; text-align: center; transition: all 0.15s;
-    }
-    .mode-tab + .mode-tab { border-left: 1px solid var(--border); }
-    .mode-tab.active { background: var(--surface2); color: var(--text); }
-    .mode-tab:hover:not(.active) { color: var(--text); }
-
-    /* ── Range label ── */
-    .range-label {
-      font-size: 0.78rem; color: var(--muted);
-      margin-bottom: 1.1rem;
-      display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;
-    }
-    .range-label strong { color: var(--text); }
-    .range-sep { color: var(--border); margin: 0 0.15rem; }
-
-    /* ── Optimal Mix card ── */
-    .mix-card {
-      background: var(--surface2);
-      border: 1px solid var(--green-dim);
-      border-radius: 12px; padding: 1.2rem 1.4rem;
-      margin-bottom: 1.25rem;
-      display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .mix-main { flex: 0 0 auto; min-width: 160px; }
-    .mix-badge {
-      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.12em;
-      text-transform: uppercase; background: var(--green);
-      color: #081a10; padding: 0.18rem 0.55rem;
-      border-radius: 999px; display: inline-block; margin-bottom: 0.4rem;
-    }
-    .mix-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.15rem; }
-    .mix-cost  { font-size: 2rem; font-weight: 900; color: var(--green); line-height: 1.1; }
-    .mix-sub   { font-size: 0.7rem; color: var(--muted); margin-top: 0.25rem; }
-
-    .mix-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-start; }
-    .mix-chip {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.4rem 0.65rem;
-      text-align: center; min-width: 80px;
-      transition: background 0.2s;
-    }
-    .chip-name  { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
-    .chip-count { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-top: 0.15rem; }
-    .chip-unit  { font-size: 0.6rem; color: var(--muted); font-weight: 400; margin-left: 0.15rem; }
-
-    /* ── Summary cards ── */
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
-      gap: 0.65rem; margin-bottom: 1.25rem;
-    }
-    .summary-card {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 10px; padding: 0.85rem 0.7rem;
-      text-align: center; transition: border-color 0.2s, background 0.2s;
-    }
-    .summary-card.cheapest { border-color: var(--green); }
-    .summary-card.no-price { opacity: 0.38; }
-
-    .badge {
-      font-size: 0.57rem; font-weight: 800; letter-spacing: 0.1em;
-      background: var(--green); color: #081a10;
-      padding: 0.12rem 0.4rem; border-radius: 999px;
-      display: inline-block; margin-bottom: 0.3rem; text-transform: uppercase;
-    }
-    .s-stone { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-    .s-cost  { font-size: 1.12rem; font-weight: 800; color: var(--gold); margin: 0.25rem 0 0.1rem; line-height: 1; }
-    .s-cost.green { color: var(--green); }
-    .s-sub   { font-size: 0.67rem; color: var(--muted); }
-
-    /* ── Breakdown table ── */
-    .table-wrap { overflow-x: auto; margin-top: 1.2rem; }
-    .breakdown { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 520px; }
-
-    .breakdown thead th {
-      background: var(--surface2); color: var(--muted);
-      font-size: 0.67rem; font-weight: 700; letter-spacing: 0.08em;
-      text-transform: uppercase; padding: 0.55rem 0.7rem;
-      text-align: right; white-space: nowrap;
-      transition: background 0.2s;
-    }
-    .breakdown thead th:first-child,
-    .breakdown thead th:nth-child(2) { text-align: left; }
-    .breakdown thead th.th-mix { color: var(--green); }
-
-    .breakdown tbody td {
-      padding: 0.45rem 0.7rem;
-      border-bottom: 1px solid var(--row-div);
-      text-align: right; color: var(--text);
-    }
-    .breakdown tbody td:first-child { text-align: left; font-weight: 600; color: var(--muted); }
-    .breakdown tbody td:nth-child(2) { text-align: left; color: var(--muted); }
-    .breakdown tbody tr:hover td { background: var(--row-hover); }
-
-    .breakdown tfoot td {
-      padding: 0.55rem 0.7rem; text-align: right;
-      font-weight: 700; border-top: 2px solid var(--border);
-      color: var(--gold); font-size: 0.82rem;
-    }
-    .breakdown tfoot td:first-child { text-align: left; text-transform: uppercase; letter-spacing: 0.05em; }
-    .breakdown tfoot td:nth-child(2) { text-align: left; }
-    .breakdown tfoot td.td-mix { color: var(--green); }
-
-    .cell-best { color: var(--green); font-weight: 700; }
-    .cell-na   { color: var(--border); }
-    .mix-stone-tag {
-      display: block; font-size: 0.58rem;
-      color: var(--green); opacity: 0.75; margin-top: 1px;
-    }
-
-    /* ── Stone quantities panel ── */
-    .stones-panel { margin-top: 0.85rem; }
-    .stones-toggle {
-      background: none; border: 1px solid var(--border);
-      border-radius: 6px; color: var(--muted);
-      font-size: 0.75rem; padding: 0.3rem 0.75rem;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .stones-toggle:hover { border-color: var(--gold-dim); color: var(--text); }
-
-    .stones-section-lbl {
-      font-size: 0.67rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.1em; color: var(--muted);
-      margin: 1rem 0 0.5rem;
-    }
-    .stones-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
-      gap: 0.5rem;
-    }
-    .stone-qty {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.6rem;
-      text-align: center; transition: background 0.2s;
-    }
-    .stone-qty.hl { border-color: var(--green-dim); }
-    .sq-name { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
-    .sq-qty  { font-size: 0.92rem; font-weight: 700; color: var(--text); margin-top: 0.2rem; }
-    .sq-qty.green { color: var(--green); }
-
-    /* ── Misc ── */
-    .empty { color: var(--muted); font-size: 0.85rem; padding: 1rem 0; }
-    .warn  { color: var(--warn); font-size: 0.85rem; padding: 0.5rem 0; }
-
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      main { padding: 1rem; }
-      header { padding: 1.2rem 1rem; }
-      header h1 { font-size: 1.3rem; letter-spacing: 2px; }
-      #themeBtn { top: 0.7rem; right: 0.7rem; font-size: 0.7rem; padding: 0.3rem 0.6rem; }
-      .summary-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-      .mix-cost { font-size: 1.5rem; }
+    @media(max-width:600px){
+      main{padding:1rem}
+      header{padding:1.2rem 1rem}
+      header h1{font-size:1.3rem;letter-spacing:2px}
+      #themeBtn{top:.7rem;right:.7rem;font-size:.7rem;padding:.3rem .6rem}
+      .summary-grid{grid-template-columns:repeat(auto-fill,minmax(98px,1fr))}
+      .mix-cost{font-size:1.5rem}
     }
   </style>
 </head>
@@ -336,8 +154,8 @@
 <header>
   <button id="themeBtn" onclick="toggleTheme()">☀️ Light</button>
   <h1>ROX NEXT GENERATION</h1>
-  <p class="sub">Enchantment Cost Calculator</p>
-  <p class="credits">by <strong>Kyoshio</strong> &mdash; 1002 فرعون</p>
+  <p class="hdr-sub">Enchantment Cost Calculator</p>
+  <p class="hdr-credits">by <strong>Kyoshio</strong> &mdash; 1002 فرعون</p>
 </header>
 
 <main>
@@ -345,36 +163,50 @@
   <!-- Market Prices -->
   <div class="card">
     <div class="card-title">
-      <span class="icon">📊</span>
-      Market Prices
-      <em style="font-style:normal;font-weight:400;color:var(--muted);font-size:0.7rem;letter-spacing:0;">(crystals per stone)</em>
+      📊 Market Prices
+      <em style="font-style:normal;font-weight:400;color:var(--muted);font-size:.7rem;letter-spacing:0;">(crystals per stone / Muspellium)</em>
       <span class="saved-pill" id="savedPill">✓ saved</span>
     </div>
+
     <div class="prices-wrap">
-      <table class="prices-table">
-        <thead>
-          <tr>
-            <th>Equipment</th>
-            <th>Pront</th><th>Izlude</th><th>Morroc</th><th>Alberta</th>
-            <th>Payon</th><th>Geffen</th><th>Glast Heim</th>
-          </tr>
-        </thead>
-        <tbody id="pricesTbody"></tbody>
-      </table>
+      <table class="prices-table" id="pricesTable"></table>
     </div>
-    <p class="price-note">* Defaults from spreadsheet (April 9, 2026). Prices auto-save in your browser. Glast Heim not listed — enter manually if known.</p>
+
+    <p class="price-note">
+      * Prontera uses <strong>Muspellium</strong> (raw material). All other cities use <strong>Crafted Enchant Stones</strong> (separate Weapon / Armor / Accessory items).<br>
+      * Prices default to spreadsheet values (Apr 9, 2026) and auto-save in your browser. Glast Heim prices not listed — enter if known.
+    </p>
+
+    <button class="ref-toggle" onclick="toggleRef()">▼ Show attempts per enchant (reference)</button>
+    <div id="refPanel" style="display:none;overflow-x:auto">
+      <table class="ref-table">
+        <thead><tr><th>Equipment</th><th>Prontera (Muspel)</th><th>Other Cities (Stones)</th></tr></thead>
+        <tbody>
+          <tr><td>Dagger</td><td>45</td><td>3</td></tr>
+          <tr><td>Off Hand</td><td>30</td><td>2</td></tr>
+          <tr><td>1 Hand</td><td>60</td><td>4</td></tr>
+          <tr><td>2 Hand</td><td>90</td><td>6</td></tr>
+          <tr><td>Armor</td><td>30</td><td>2 *</td></tr>
+          <tr><td>Accessory</td><td>30</td><td>2 *</td></tr>
+        </tbody>
+      </table>
+      <p class="price-note">* Armor &amp; Accessory assumed 2 stones/attempt for non-Prontera cities (matches original spreadsheet data).</p>
+    </div>
   </div>
 
   <!-- Calculator -->
   <div class="card">
-    <div class="card-title"><span class="icon">⚗️</span> Calculator</div>
+    <div class="card-title">⚗️ Calculator</div>
     <div class="controls">
       <div class="control-group">
         <div class="control-label">Equipment Type</div>
         <div class="btn-group" id="equipBtns">
-          <button class="btn active" data-equip="Weapon"    onclick="setEquip(this)">Weapon</button>
-          <button class="btn"        data-equip="Armor"     onclick="setEquip(this)">Armor</button>
-          <button class="btn"        data-equip="Accessory" onclick="setEquip(this)">Accessory</button>
+          <button class="btn active" data-equip="Dagger"     onclick="setEquip(this)">Dagger</button>
+          <button class="btn"        data-equip="Off Hand"   onclick="setEquip(this)">Off Hand</button>
+          <button class="btn"        data-equip="1 Hand"     onclick="setEquip(this)">1 Hand</button>
+          <button class="btn"        data-equip="2 Hand"     onclick="setEquip(this)">2 Hand</button>
+          <button class="btn"        data-equip="Armor"      onclick="setEquip(this)">Armor</button>
+          <button class="btn"        data-equip="Accessory"  onclick="setEquip(this)">Accessory</button>
         </div>
       </div>
       <div class="control-group">
@@ -389,7 +221,7 @@
         <div class="control-label">Table shows</div>
         <div class="mode-tabs">
           <button class="mode-tab active" id="tabCrystal" onclick="setMode('crystal')">Crystals</button>
-          <button class="mode-tab"        id="tabStones"  onclick="setMode('stones')">Stones</button>
+          <button class="mode-tab"        id="tabMat"     onclick="setMode('mat')">Materials</button>
         </div>
       </div>
     </div>
@@ -397,386 +229,401 @@
 
   <!-- Results -->
   <div class="card">
-    <div class="card-title"><span class="icon">💎</span> Results</div>
+    <div class="card-title">💎 Results</div>
     <div id="resultsContent"><p class="empty">Adjust the settings above to see results.</p></div>
   </div>
 
 </main>
 
-<footer style="
-  max-width:1320px; margin:0 auto 2rem; padding:1.2rem 1.5rem 0;
-  font-size:0.72rem; color:var(--muted); line-height:1.75;
-  border-top:1px solid var(--border);
-">
-  <p style="margin-bottom:0.35rem;font-weight:700;color:var(--text);font-size:0.74rem;text-transform:uppercase;letter-spacing:0.08em;">Disclaimer</p>
-  <p>This tool is an independent, fan-made calculator and is <strong>not affiliated with, endorsed by, or associated with
-  Gravity Co., Ltd.</strong>, Gravity Game Hub, or any of their subsidiaries or partners.
-  <em>ROX: Next Generation</em> and all related names, characters, and game content are trademarks and intellectual
-  property of Gravity Co., Ltd. All game data is derived from publicly observable in-game information for
-  non-commercial, informational purposes only.</p>
-  <p style="margin-top:0.45rem;">Market prices shown are community-sourced estimates and may not reflect current in-game values.
-  The author assumes no responsibility for decisions made based on this tool.</p>
-  <p style="margin-top:0.75rem;color:var(--border);font-size:0.67rem;">
-    &copy; 2026 Kyoshio &mdash; 1002 فرعون &nbsp;|&nbsp; Not affiliated with Gravity Co., Ltd.
-  </p>
+<footer style="max-width:1320px;margin:0 auto 2rem;padding:1.2rem 1.5rem 0;font-size:.72rem;color:var(--muted);line-height:1.75;border-top:1px solid var(--border)">
+  <p style="margin-bottom:.35rem;font-weight:700;color:var(--text);font-size:.74rem;text-transform:uppercase;letter-spacing:.08em">Disclaimer</p>
+  <p>This tool is an independent, fan-made calculator and is <strong>not affiliated with, endorsed by, or associated with Gravity Co., Ltd.</strong>, Gravity Game Hub, or any of their subsidiaries or partners. <em>ROX: Next Generation</em> and all related names, characters, and game content are trademarks and intellectual property of Gravity Co., Ltd. All game data is derived from publicly observable in-game information for non-commercial, informational purposes only.</p>
+  <p style="margin-top:.45rem">Market prices are community-sourced estimates. The author assumes no responsibility for decisions made based on this tool.</p>
+  <p style="margin-top:.75rem;color:var(--border);font-size:.67rem">&copy; 2026 Kyoshio &mdash; 1002 فرعون &nbsp;|&nbsp; Not affiliated with Gravity Co., Ltd.</p>
 </footer>
 
 <script>
 'use strict';
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ── Static data ───────────────────────────────────────────────────────────────
 
-const STONES = ['Pront','Izlude','Morroc','Alberta','Payon','Geffen','Glast Heim'];
+const CITIES = ['Pront','Izlude','Morroc','Alberta','Payon','Geffen','Glast Heim'];
+const NON_PRONT = ['Izlude','Morroc','Alberta','Payon','Geffen','Glast Heim'];
+const EQUIP_TYPES = ['Dagger','Off Hand','1 Hand','2 Hand','Armor','Accessory'];
+const WEAPON_TYPES = new Set(['Dagger','Off Hand','1 Hand','2 Hand']);
 
-// Stones needed per level = reqExp * multiplier
-const MULT = {
-  'Pront':30, 'Izlude':2, 'Morroc':1, 'Alberta':0.5,
-  'Payon':0.25, 'Geffen':0.125, 'Glast Heim':0.0625,
+// How many EXP points one attempt grants per city tier
+const TIER_EXP = {
+  'Pront':1,'Izlude':1,'Morroc':2,'Alberta':4,'Payon':8,'Geffen':16,'Glast Heim':32
 };
 
-// EXP required per level (incremental, not cumulative)
+// Material consumed per single enchant attempt, by equipment type
+const ATT = {
+  pront: {'Dagger':45,'Off Hand':30,'1 Hand':60,'2 Hand':90,'Armor':30,'Accessory':30},
+  other: {'Dagger':3, 'Off Hand':2, '1 Hand':4, '2 Hand':6, 'Armor':2, 'Accessory':2}
+};
+
+// Level EXP requirements (incremental)
 const LVL_EXP = {
   2:10,3:30,4:60,5:100,6:150,7:250,8:400,
   9:600,10:850,11:1150,12:1550,13:2050,14:2800,
-  15:3800,16:5050,17:6550,18:8300,19:10300,20:12550,
+  15:3800,16:5050,17:6550,18:8300,19:10300,20:12550
 };
 
+// Material label per city
+const MAT_LABEL = c => c === 'Pront' ? 'Muspellium' : 'stones';
+
+// Default prices (Apr 9 2026)
+// pront = Muspellium price; cities[city] = { weapon, armor, accessory } stone prices
 const DEFAULTS = {
-  Weapon:    {Pront:88,Izlude:1400,Morroc:2740,Alberta:5480, Payon:20200,Geffen:47000,'Glast Heim':null},
-  Armor:     {Pront:88,Izlude:1440,Morroc:2740,Alberta:5650, Payon:21800,Geffen:47000,'Glast Heim':null},
-  Accessory: {Pront:88,Izlude:1440,Morroc:2740,Alberta:5650, Payon:21800,Geffen:47000,'Glast Heim':null},
+  pront: 88,
+  cities: {
+    'Izlude':     {weapon:1400, armor:1440, accessory:1440},
+    'Morroc':     {weapon:2740, armor:2740, accessory:2740},
+    'Alberta':    {weapon:5480, armor:5650, accessory:5650},
+    'Payon':      {weapon:20200,armor:21800,accessory:21800},
+    'Geffen':     {weapon:47000,armor:47000,accessory:47000},
+    'Glast Heim': {weapon:null, armor:null, accessory:null}
+  }
 };
 
 let PRICES = JSON.parse(JSON.stringify(DEFAULTS));
 
 // ── State ─────────────────────────────────────────────────────────────────────
+let equip = 'Dagger', tableMode = 'crystal', showQty = false, showRef = false;
 
-let equip     = 'Weapon';
-let tableMode = 'crystal';
-let showQty   = false;
-
-// ── localStorage ─────────────────────────────────────────────────────────────
-
+// ── Persistence ───────────────────────────────────────────────────────────────
 function savePrices() {
-  try { localStorage.setItem('rox-prices', JSON.stringify(PRICES)); } catch(_) {}
-  const pill = document.getElementById('savedPill');
-  pill.classList.add('show');
-  clearTimeout(pill._t);
-  pill._t = setTimeout(() => pill.classList.remove('show'), 1800);
+  try { localStorage.setItem('rox-prices2', JSON.stringify(PRICES)); } catch(_) {}
+  const p = document.getElementById('savedPill');
+  p.classList.add('show'); clearTimeout(p._t);
+  p._t = setTimeout(() => p.classList.remove('show'), 1800);
 }
 
 function loadPrices() {
   try {
-    const raw = localStorage.getItem('rox-prices');
+    const raw = localStorage.getItem('rox-prices2');
     if (!raw) return;
-    const saved = JSON.parse(raw);
-    ['Weapon','Armor','Accessory'].forEach(eq => {
-      STONES.forEach(st => {
-        if (saved[eq]?.[st] !== undefined) PRICES[eq][st] = saved[eq][st];
-      });
+    const s = JSON.parse(raw);
+    if (s.pront != null) PRICES.pront = s.pront;
+    NON_PRONT.forEach(city => {
+      if (s.cities?.[city]) {
+        ['weapon','armor','accessory'].forEach(t => {
+          if (s.cities[city][t] !== undefined) PRICES.cities[city][t] = s.cities[city][t];
+        });
+      }
     });
   } catch(_) {}
 }
 
-function saveTheme(light) {
-  try { localStorage.setItem('rox-theme', light ? 'light' : 'dark'); } catch(_) {}
-}
-
-function loadTheme() {
-  try {
-    if (localStorage.getItem('rox-theme') === 'light') applyLight(true, false);
-  } catch(_) {}
-}
-
-// ── Theme ─────────────────────────────────────────────────────────────────────
-
-function applyLight(on, save = true) {
+function saveTheme(on) { try { localStorage.setItem('rox-theme', on ? 'light' : 'dark'); } catch(_) {} }
+function loadTheme() { try { if (localStorage.getItem('rox-theme') === 'light') applyLight(true, false); } catch(_) {} }
+function applyLight(on, save=true) {
   document.body.classList.toggle('light', on);
   document.getElementById('themeBtn').textContent = on ? '🌙 Dark' : '☀️ Light';
   if (save) saveTheme(on);
 }
+function toggleTheme() { applyLight(!document.body.classList.contains('light')); }
 
-function toggleTheme() {
-  applyLight(!document.body.classList.contains('light'));
+// ── Calculation ───────────────────────────────────────────────────────────────
+
+// Materials needed for reqExp points at a given city
+function getMat(city, eq, reqExp) {
+  const attCost = city === 'Pront' ? ATT.pront[eq] : ATT.other[eq];
+  return reqExp * attCost / TIER_EXP[city];
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// Price per unit of material (Muspellium or stone)
+function getPrice(city, eq) {
+  if (city === 'Pront') return PRICES.pront;
+  const key = WEAPON_TYPES.has(eq) ? 'weapon' : eq.toLowerCase();
+  return PRICES.cities[city]?.[key] ?? null;
+}
 
+function getCost(city, eq, reqExp) {
+  const p = getPrice(city, eq);
+  return p != null ? getMat(city, eq, reqExp) * p : null;
+}
+
+function optimalMix(levels) {
+  const perLvl = [], counts = Object.fromEntries(CITIES.map(c => [c, 0]));
+  let total = 0, incomplete = false;
+  for (const lvl of levels) {
+    const exp = LVL_EXP[lvl];
+    let best = null, bestCost = Infinity;
+    CITIES.forEach(c => {
+      const cost = getCost(c, equip, exp);
+      if (cost != null && cost < bestCost) { bestCost = cost; best = c; }
+    });
+    if (!best) { incomplete = true; perLvl.push({lvl, city:null, cost:null}); }
+    else { counts[best] += getMat(best, equip, exp); total += bestCost; perLvl.push({lvl, city:best, cost:bestCost}); }
+  }
+  return { total: incomplete ? null : total, perLvl, counts };
+}
+
+// ── Formatting ────────────────────────────────────────────────────────────────
+const fmtC  = n => n == null ? '<span class="cell-na">—</span>' : Math.ceil(n).toLocaleString();
+const fmtM  = n => {
+  if (n == null) return '<span class="cell-na">—</span>';
+  if (n < 1)    return n.toPrecision(4).replace(/\.?0+$/,'');
+  if (n % 1)    return n.toLocaleString(undefined,{maximumFractionDigits:3});
+  return n.toLocaleString();
+};
+const fmtMP = n => {
+  if (n < 1) return n.toPrecision(4).replace(/\.?0+$/,'');
+  if (n % 1) return n.toLocaleString(undefined,{maximumFractionDigits:3});
+  return n.toLocaleString();
+};
+
+// ── Init: price table ─────────────────────────────────────────────────────────
 function initPriceTable() {
-  const tbody = document.getElementById('pricesTbody');
-  ['Weapon','Armor','Accessory'].forEach(eq => {
+  const tbl = document.getElementById('pricesTable');
+
+  // Header
+  const hdr = document.createElement('thead');
+  hdr.innerHTML = `<tr>
+    <th>Material</th>
+    <th>Prontera<br><span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:.65rem">(Muspellium)</span></th>
+    ${NON_PRONT.map(c=>`<th>${c}</th>`).join('')}
+  </tr>`;
+  tbl.appendChild(hdr);
+
+  const tbody = document.createElement('tbody');
+
+  // Muspellium row
+  const trMus = document.createElement('tr');
+  trMus.innerHTML = `<td>Muspellium</td>`;
+  const tdMus = document.createElement('td');
+  const inpMus = mkInput(PRICES.pront, v => { PRICES.pront = v; savePrices(); calculate(); });
+  tdMus.appendChild(inpMus);
+  trMus.appendChild(tdMus);
+  NON_PRONT.forEach(() => {
+    const td = document.createElement('td');
+    const inp = document.createElement('input');
+    inp.className = 'price-input'; inp.disabled = true; inp.placeholder = '—';
+    td.appendChild(inp); trMus.appendChild(td);
+  });
+  tbody.appendChild(trMus);
+
+  // Weapon / Armor / Accessory stone rows for non-Pront cities
+  [['Weapon Stone','weapon'],['Armor Stone','armor'],['Accessory Stone','accessory']].forEach(([label, key]) => {
     const tr = document.createElement('tr');
-    const lbl = document.createElement('td');
-    lbl.textContent = eq;
-    tr.appendChild(lbl);
-    STONES.forEach(st => {
-      const td  = document.createElement('td');
-      const inp = document.createElement('input');
-      inp.type = 'number'; inp.className = 'price-input';
-      inp.min = 0; inp.step = 1;
-      const v = PRICES[eq][st];
-      if (v !== null) inp.value = v; else inp.placeholder = '—';
-      inp.addEventListener('input', () => {
-        const n = parseFloat(inp.value);
-        PRICES[eq][st] = inp.value === '' || isNaN(n) ? null : n;
-        savePrices(); calculate();
+    tr.innerHTML = `<td>${label}</td>`;
+
+    // Pront cell (disabled — Pront uses Muspellium)
+    const tdPront = document.createElement('td');
+    const inpPront = document.createElement('input');
+    inpPront.className = 'price-input'; inpPront.disabled = true; inpPront.placeholder = '—';
+    tdPront.appendChild(inpPront); tr.appendChild(tdPront);
+
+    NON_PRONT.forEach(city => {
+      const td = document.createElement('td');
+      const inp = mkInput(PRICES.cities[city][key], v => {
+        PRICES.cities[city][key] = v; savePrices(); calculate();
       });
       td.appendChild(inp); tr.appendChild(td);
     });
     tbody.appendChild(tr);
   });
+
+  tbl.appendChild(tbody);
 }
 
+function mkInput(defaultVal, onChange) {
+  const inp = document.createElement('input');
+  inp.type = 'number'; inp.className = 'price-input'; inp.min = 0; inp.step = 1;
+  if (defaultVal != null) inp.value = defaultVal; else inp.placeholder = '—';
+  inp.addEventListener('input', () => {
+    const n = parseFloat(inp.value);
+    onChange(inp.value === '' || isNaN(n) ? null : n);
+  });
+  return inp;
+}
+
+// ── Init: level selectors ─────────────────────────────────────────────────────
 function initLevels() {
   const from = document.getElementById('fromLevel');
   const to   = document.getElementById('toLevel');
-  for (let i = 1; i <= 19; i++) {
-    const o = new Option(`Level ${i}`, i);
-    from.appendChild(o);
-  }
+  for (let i = 1; i <= 19; i++) from.appendChild(new Option(`Level ${i}`, i));
   from.value = 1;
-  for (let i = 2; i <= 20; i++) {
-    const o = new Option(`Level ${i}`, i);
-    to.appendChild(o);
-  }
+  for (let i = 2; i <= 20; i++) to.appendChild(new Option(`Level ${i}`, i));
   to.value = 20;
 }
 
 // ── Controls ──────────────────────────────────────────────────────────────────
-
 function setEquip(btn) {
   equip = btn.dataset.equip;
   document.querySelectorAll('#equipBtns .btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   calculate();
 }
-
 function setMode(mode) {
   tableMode = mode;
   document.getElementById('tabCrystal').classList.toggle('active', mode === 'crystal');
-  document.getElementById('tabStones').classList.toggle('active', mode === 'stones');
+  document.getElementById('tabMat').classList.toggle('active', mode === 'mat');
   calculate();
 }
-
 function onLevelChange() {
   const f = +document.getElementById('fromLevel').value;
   const t = +document.getElementById('toLevel').value;
-  if (t <= f) document.getElementById('toLevel').value = Math.min(f + 1, 20);
+  if (t <= f) document.getElementById('toLevel').value = Math.min(f+1, 20);
   calculate();
 }
-
-// ── Formatting ────────────────────────────────────────────────────────────────
-
-const fmtC  = n => n == null ? '<span class="cell-na">—</span>' : Math.ceil(n).toLocaleString();
-const fmtS  = n => {
-  if (n == null) return '<span class="cell-na">—</span>';
-  if (n < 1)    return n.toPrecision(4).replace(/\.?0+$/, '');
-  if (n % 1)    return n.toLocaleString(undefined, {maximumFractionDigits:3});
-  return n.toLocaleString();
-};
-const fmtSP = n => {
-  if (n < 1)  return n.toPrecision(4).replace(/\.?0+$/, '');
-  if (n % 1)  return n.toLocaleString(undefined, {maximumFractionDigits:3});
-  return n.toLocaleString();
-};
-
-// ── Optimal Mix ───────────────────────────────────────────────────────────────
-
-function optimalMix(levels) {
-  const perLvl = [];
-  const counts = Object.fromEntries(STONES.map(s => [s, 0]));
-  let total = 0, partial = false;
-
-  for (const lvl of levels) {
-    const exp = LVL_EXP[lvl];
-    let best = null, bestCost = Infinity;
-    STONES.forEach(st => {
-      const p = PRICES[equip][st];
-      if (p != null) {
-        const c = exp * MULT[st] * p;
-        if (c < bestCost) { bestCost = c; best = st; }
-      }
-    });
-    if (!best) { partial = true; perLvl.push({lvl, stone:null, cost:null}); }
-    else {
-      counts[best] += exp * MULT[best];
-      total += bestCost;
-      perLvl.push({lvl, stone:best, cost:bestCost});
-    }
-  }
-  return { total: partial ? null : total, perLvl, counts };
+function toggleRef() {
+  showRef = !showRef;
+  document.getElementById('refPanel').style.display = showRef ? 'block' : 'none';
+  document.querySelector('.ref-toggle').textContent = (showRef ? '▲ Hide' : '▼ Show') + ' attempts per enchant (reference)';
 }
+function toggleQty() { showQty = !showQty; calculate(); }
 
 // ── Render ────────────────────────────────────────────────────────────────────
-
 function calculate() {
   const from = +document.getElementById('fromLevel').value;
   const to   = +document.getElementById('toLevel').value;
-
   if (from >= to) {
     document.getElementById('resultsContent').innerHTML = '<p class="warn">⚠ Target level must be higher than current level.</p>';
     return;
   }
 
   const levels = [];
-  for (let l = from + 1; l <= to; l++) levels.push(l);
+  for (let l = from+1; l <= to; l++) levels.push(l);
+  const totalEXP = levels.reduce((s,l) => s + LVL_EXP[l], 0);
 
-  const totalEXP = levels.reduce((s, l) => s + LVL_EXP[l], 0);
-
-  // Per-stone totals
+  // Per-city totals
   const totals = {};
-  STONES.forEach(st => {
-    const p = PRICES[equip][st];
-    const stones = levels.reduce((s, l) => s + LVL_EXP[l] * MULT[st], 0);
-    totals[st] = { stones, cost: p != null ? stones * p : null };
+  CITIES.forEach(city => {
+    let mat = 0;
+    levels.forEach(l => { mat += getMat(city, equip, LVL_EXP[l]); });
+    const p = getPrice(city, equip);
+    totals[city] = { mat, cost: p != null ? mat * p : null };
   });
 
-  // Cheapest single stone
-  let bestSingle = null, bestCost = Infinity;
-  STONES.forEach(st => {
-    if (totals[st].cost != null && totals[st].cost < bestCost) {
-      bestCost = totals[st].cost; bestSingle = st;
-    }
+  // Cheapest single city
+  let bestCity = null, bestCost = Infinity;
+  CITIES.forEach(c => {
+    if (totals[c].cost != null && totals[c].cost < bestCost) { bestCost = totals[c].cost; bestCity = c; }
   });
 
   // Optimal mix
   const mix = optimalMix(levels);
 
-  // ── Range label ──
+  // Range label
   const rangeHTML = `<div class="range-label">
-    <strong>${equip}</strong>
-    <span class="range-sep">|</span>
+    <strong>${equip}</strong><span class="range-sep">|</span>
     Level <strong>${from}</strong> → Level <strong>${to}</strong>
-    <span class="range-sep">|</span>
-    ${levels.length} level${levels.length > 1 ? 's' : ''}
-    <span class="range-sep">|</span>
-    ${totalEXP.toLocaleString()} total EXP
+    <span class="range-sep">|</span>${levels.length} level${levels.length>1?'s':''}
+    <span class="range-sep">|</span>${totalEXP.toLocaleString()} total EXP
   </div>`;
 
-  // ── Optimal Mix featured card ──
+  // Optimal mix card
   let mixHTML = '';
   if (mix.total != null) {
-    const usedStones = STONES.filter(s => mix.counts[s] > 0);
+    const used = CITIES.filter(c => mix.counts[c] > 0);
     mixHTML = `<div class="mix-card">
       <div class="mix-main">
         <div class="mix-badge">⚡ Optimal Mix</div>
-        <div class="mix-label">Cheapest stone per level</div>
+        <div class="mix-label">Cheapest city per level</div>
         <div class="mix-cost">${Math.ceil(mix.total).toLocaleString()}</div>
         <div class="mix-sub">crystals total</div>
       </div>
-      <div class="mix-chips">
-        ${usedStones.map(s => `
-          <div class="mix-chip">
-            <div class="chip-name">${s}</div>
-            <div class="chip-count">${fmtSP(mix.counts[s])}<span class="chip-unit">stones</span></div>
-          </div>`).join('')}
+      <div class="mix-chips">${used.map(c => `
+        <div class="mix-chip">
+          <div class="chip-name">${c}</div>
+          <div class="chip-count">${fmtMP(mix.counts[c])}<span class="chip-unit">${MAT_LABEL(c)}</span></div>
+        </div>`).join('')}
       </div>
     </div>`;
   }
 
-  // ── Per-stone summary cards ──
+  // Summary cards
   let cardsHTML = `<div class="summary-grid">`;
-  STONES.forEach(st => {
-    const t = totals[st];
-    const best = st === bestSingle;
-    cardsHTML += `<div class="summary-card ${best ? 'cheapest' : ''} ${t.cost == null ? 'no-price' : ''}">
-      ${best ? '<div class="badge">Best single</div>' : ''}
-      <div class="s-stone">${st}</div>
-      <div class="s-cost ${best ? 'green' : ''}">${t.cost != null ? Math.ceil(t.cost).toLocaleString() : '—'}</div>
-      <div class="s-sub">${fmtSP(t.stones)} stones</div>
+  CITIES.forEach(c => {
+    const t = totals[c], best = c === bestCity;
+    cardsHTML += `<div class="summary-card ${best?'cheapest':''} ${t.cost==null?'no-price':''}">
+      ${best?'<div class="badge">Cheapest</div>':''}
+      <div class="s-city">${c}</div>
+      <div class="s-cost ${best?'green':''}">${t.cost!=null?Math.ceil(t.cost).toLocaleString():'—'}</div>
+      <div class="s-sub">${fmtMP(t.mat)} ${MAT_LABEL(c)}</div>
     </div>`;
   });
   cardsHTML += `</div>`;
 
-  // ── Breakdown table ──
+  // Breakdown table
   const isCrystal = tableMode === 'crystal';
-
   let tbl = `<div class="table-wrap"><table class="breakdown"><thead><tr>
     <th>Level</th><th>EXP</th>
-    ${isCrystal ? '<th class="th-mix">Best Mix</th>' : ''}
-    ${STONES.map(s => `<th>${s}</th>`).join('')}
+    ${isCrystal?'<th class="th-mix">Best Mix</th>':''}
+    ${CITIES.map(c=>`<th>${c}${c==='Pront'?'<br><span style="font-weight:400;letter-spacing:0;text-transform:none;font-size:.6rem">Muspel</span>':''}</th>`).join('')}
   </tr></thead><tbody>`;
 
   levels.forEach((lvl, i) => {
     const exp = LVL_EXP[lvl];
-    tbl += `<tr><td>${lvl - 1} → ${lvl}</td><td>${exp.toLocaleString()}</td>`;
-
+    tbl += `<tr><td>${lvl-1} → ${lvl}</td><td>${exp.toLocaleString()}</td>`;
     if (isCrystal) {
       const m = mix.perLvl[i];
-      tbl += m?.cost != null
-        ? `<td class="cell-best">${Math.ceil(m.cost).toLocaleString()}<span class="mix-stone-tag">${m.stone}</span></td>`
+      tbl += m?.cost!=null
+        ? `<td class="cell-best">${Math.ceil(m.cost).toLocaleString()}<span class="mix-tag">${m.city}</span></td>`
         : `<td>${fmtC(null)}</td>`;
     }
-
-    STONES.forEach(st => {
-      const stones = exp * MULT[st];
-      const p = PRICES[equip][st];
-      const best = st === bestSingle;
+    CITIES.forEach(c => {
+      const best = c === bestCity;
       if (isCrystal) {
-        tbl += `<td class="${best ? 'cell-best' : ''}">${fmtC(p != null ? stones * p : null)}</td>`;
+        tbl += `<td class="${best?'cell-best':''}">${fmtC(getCost(c,equip,exp))}</td>`;
       } else {
-        tbl += `<td class="${best ? 'cell-best' : ''}">${fmtS(stones)}</td>`;
+        tbl += `<td class="${best?'cell-best':''}">${fmtM(getMat(c,equip,exp))}</td>`;
       }
     });
     tbl += `</tr>`;
   });
 
-  // Footer
+  // Footer totals
   tbl += `</tbody><tfoot><tr><td>Total</td><td>${totalEXP.toLocaleString()}</td>`;
   if (isCrystal) {
-    tbl += mix.total != null
+    tbl += mix.total!=null
       ? `<td class="td-mix">${Math.ceil(mix.total).toLocaleString()}</td>`
       : `<td>${fmtC(null)}</td>`;
   }
-  STONES.forEach(st => {
-    const t = totals[st]; const best = st === bestSingle;
+  CITIES.forEach(c => {
+    const t = totals[c], best = c === bestCity;
     tbl += isCrystal
-      ? `<td class="${best ? 'cell-best' : ''}">${fmtC(t.cost)}</td>`
-      : `<td class="${best ? 'cell-best' : ''}">${fmtS(t.stones)}</td>`;
+      ? `<td class="${best?'cell-best':''}">${fmtC(t.cost)}</td>`
+      : `<td class="${best?'cell-best':''}">${fmtM(t.mat)}</td>`;
   });
   tbl += `</tr></tfoot></table></div>`;
 
-  // ── Stone quantities panel ──
+  // Material quantities panel (crystal mode only)
   let qtyHTML = '';
   if (isCrystal) {
     const inner = showQty ? `
-      ${mix.total != null ? `
-        <div class="stones-section-lbl">Optimal Mix — stones to buy</div>
-        <div class="stones-grid">
-          ${STONES.filter(s => mix.counts[s] > 0).map(s => `
-            <div class="stone-qty hl">
-              <div class="sq-name">${s}</div>
-              <div class="sq-qty green">${fmtSP(mix.counts[s])}</div>
-            </div>`).join('')}
-        </div>` : ''}
-      <div class="stones-section-lbl">All stone types — total quantities</div>
-      <div class="stones-grid">
-        ${STONES.map(s => `
-          <div class="stone-qty ${s === bestSingle ? 'hl' : ''}">
-            <div class="sq-name">${s}</div>
-            <div class="sq-qty ${s === bestSingle ? 'green' : ''}">${fmtSP(totals[s].stones)}</div>
-          </div>`).join('')}
-      </div>` : '';
+      ${mix.total!=null?`
+        <div class="stones-lbl">Optimal Mix — materials to buy</div>
+        <div class="stones-grid">${CITIES.filter(c=>mix.counts[c]>0).map(c=>`
+          <div class="stone-qty hl">
+            <div class="sq-name">${c}</div>
+            <div class="sq-mat">${MAT_LABEL(c)}</div>
+            <div class="sq-qty green">${fmtMP(mix.counts[c])}</div>
+          </div>`).join('')}</div>` : ''}
+      <div class="stones-lbl">All cities — total materials</div>
+      <div class="stones-grid">${CITIES.map(c=>`
+        <div class="stone-qty ${c===bestCity?'hl':''}">
+          <div class="sq-name">${c}</div>
+          <div class="sq-mat">${MAT_LABEL(c)}</div>
+          <div class="sq-qty ${c===bestCity?'green':''}">${fmtMP(totals[c].mat)}</div>
+        </div>`).join('')}</div>` : '';
     qtyHTML = `<div class="stones-panel">
-      <button class="stones-toggle" onclick="toggleQty()">
-        ${showQty ? '▲ Hide' : '▼ Show'} stone quantities
-      </button>${inner}
-    </div>`;
+      <button class="stones-toggle" onclick="toggleQty()">${showQty?'▲ Hide':'▼ Show'} material quantities</button>
+      ${inner}</div>`;
   }
 
   document.getElementById('resultsContent').innerHTML = rangeHTML + mixHTML + cardsHTML + tbl + qtyHTML;
 }
 
-function toggleQty() { showQty = !showQty; calculate(); }
-
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
-
 loadPrices();
 loadTheme();
 initPriceTable();
 initLevels();
 calculate();
 </script>
-
 </body>
 </html>
