@@ -74,11 +74,14 @@ function calculate() {
 
   const dismantleGross = dismantleAmt * coinPrice;
 
-  const directTax    = calcTax(directPrice);
-  const directNet    = directPrice - directTax;
+  // Direct sale: convert Diamonds → Crystals first, then tax is applied on the crystal value
+  const directGrossCrystals = directPrice * DIAMOND_TO_CRYSTAL;
+  const directTax            = calcTax(directGrossCrystals);
+  const directNetCrystals    = directGrossCrystals - directTax;
 
-  const dismantleTax = calcTax(dismantleGross);
-  const dismantleNet = dismantleGross - dismantleTax;
+  // Dismantle: coins sell directly for Crystals, tax applied on crystal value
+  const dismantleTax         = calcTax(dismantleGross);
+  const dismantleNetCrystals = dismantleGross - dismantleTax;
 
   const out = document.getElementById('giResults');
 
@@ -86,12 +89,6 @@ function calculate() {
     out.innerHTML = '<p class="empty">Enter values above to see the comparison.</p>';
     return;
   }
-
-  // Direct sale pays in Diamonds → convert to Crystals (10 ◆ = 200 ✦, so ×20)
-  const directNetCrystals = directNet * DIAMOND_TO_CRYSTAL;
-
-  // Dismantle path sells coins directly for Crystals — no conversion needed
-  const dismantleNetCrystals = dismantleNet;
 
   const bothEntered   = directPrice > 0 && dismantleGross > 0;
   const directWins    = bothEntered && directNetCrystals >= dismantleNetCrystals;
@@ -143,18 +140,18 @@ function calculate() {
         <span class="rc-val">${fmt(directPrice)} ◆</span>
       </div>
       <div class="rc-row">
-        <span class="rc-key">Market Tax</span>
-        <span class="rc-val deduct">− ${fmt(directTax)} ◆</span>
+        <span class="rc-key">Converted to Crystals <span style="font-weight:400;font-size:.68rem">(×20)</span></span>
+        <span class="rc-val">${fmt(directGrossCrystals)} ✦</span>
       </div>
       <div class="rc-row">
-        <span class="rc-key">Post-Tax Diamonds</span>
-        <span class="rc-val dim">${fmt(directNet)} ◆</span>
+        <span class="rc-key">Market Tax</span>
+        <span class="rc-val deduct">− ${fmt(directTax)} ✦</span>
       </div>
       <div class="rc-row total-row">
-        <span class="rc-key">Net Crystals <span style="font-weight:400;font-size:.68rem">(×20)</span></span>
+        <span class="rc-key">Net Crystals</span>
         <span class="rc-val net-gold">${fmt(directNetCrystals)} ✦</span>
       </div>
-      ${taxBreakdownHTML(directPrice, directTax, showTaxDirect, 'toggleTaxDirect')}
+      ${taxBreakdownHTML(directGrossCrystals, directTax, showTaxDirect, 'toggleTaxDirect', '✦')}
     </div>`;
   } else {
     directCardHTML = `<div class="result-card">
