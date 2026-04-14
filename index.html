@@ -342,10 +342,18 @@ function toggleTheme() { applyLight(!document.body.classList.contains('light'));
 
 // ── Calculation ───────────────────────────────────────────────────────────────
 
-// Materials needed for reqExp points at a given city
+// Effective EXP for an equipment type — LVL_EXP values are the 2H baseline;
+// all other types scale down by ENCHANT_RATIOS.
+function getEffectiveEXP(eq, reqExp) {
+  return reqExp * ENCHANT_RATIOS[eq];
+}
+
+// Materials needed to gain effectiveEXP at a given city.
+// Combined effect: effectiveEXP (ratio) × attCost (ratio) = ratio² vs 2H baseline.
 function getMat(city, eq, reqExp) {
+  const effectiveExp = getEffectiveEXP(eq, reqExp);
   const attCost = city === 'Pront' ? ATT.pront[eq] : ATT.other[eq];
-  return reqExp * attCost / TIER_EXP[city];
+  return effectiveExp * attCost / TIER_EXP[city];
 }
 
 // Price per unit of material (Muspellium or stone)
@@ -502,7 +510,8 @@ function calculate() {
 
   const levels = [];
   for (let l = from+1; l <= to; l++) levels.push(l);
-  const totalEXP = levels.reduce((s,l) => s + LVL_EXP[l], 0);
+  // totalEXP is scaled for the selected equipment type (2H is the baseline)
+  const totalEXP = levels.reduce((s,l) => s + getEffectiveEXP(equip, LVL_EXP[l]), 0);
 
   // Per-city totals
   const totals = {};
@@ -572,8 +581,9 @@ function calculate() {
   </tr></thead><tbody>`;
 
   levels.forEach((lvl, i) => {
-    const exp = LVL_EXP[lvl];
-    tbl += `<tr><td>${lvl-1} → ${lvl}</td><td>${exp.toLocaleString()}</td>`;
+    const exp = LVL_EXP[lvl];                          // 2H baseline EXP
+    const effExp = getEffectiveEXP(equip, exp);        // scaled for selected equipment
+    tbl += `<tr><td>${lvl-1} → ${lvl}</td><td>${Number.isInteger(effExp) ? effExp.toLocaleString() : effExp.toLocaleString(undefined,{maximumFractionDigits:2})}</td>`;
     if (isCrystal) {
       const m = mix.perLvl[i];
       tbl += m?.cost!=null
