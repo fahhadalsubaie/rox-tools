@@ -2,8 +2,8 @@
 
 // ── Conversion ────────────────────────────────────────────────────────────────
 // Selling a gold item on the EC pays out in Diamonds, which convert to Crystals.
-// Rate: 10 Diamonds = 200 Crystals → 1 Diamond = 20 Crystals.
-const DIAMOND_TO_CRYSTAL = 20;
+// Rate: 1 Diamond = 10 Crystals (confirmed: 50,000 ◆ → 500,000 ✦).
+const DIAMOND_TO_CRYSTAL = 10;
 
 // ── Tax Brackets ──────────────────────────────────────────────────────────────
 // Progressive/marginal EC market tax (amounts in Diamonds ◆).
@@ -43,15 +43,18 @@ let showTaxDirect    = false;
 let showTaxDismantle = false;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function taxBreakdownHTML(gross, tax, panelVisible, toggleFn, currency = '◆') {
+// grossDiamonds  — value in ◆ used to compute bracket slices
+// totalTax       — pre-calculated total tax in display currency
+// multiplier     — converts each bracket's ◆ tax into display currency (1 for ✦ dismantle, DIAMOND_TO_CRYSTAL for ✦ direct sale)
+function taxBreakdownHTML(grossDiamonds, totalTax, panelVisible, toggleFn, currency = '◆', multiplier = 1) {
   const btn = `<button class="tax-toggle" onclick="${toggleFn}()">${panelVisible ? '▲ Hide' : '▼ Show'} tax breakdown</button>`;
   if (!panelVisible) return btn;
 
-  const tiers = getTaxTiers(gross);
+  const tiers = getTaxTiers(grossDiamonds);
   const rows  = tiers.map(t =>
     `<div class="tb-row">
       <span class="tb-tier">${t.label} &times; ${fmtPct(t.rate)}</span>
-      <span class="tb-amt">${fmt(t.tax)} ${currency}</span>
+      <span class="tb-amt">${fmt(t.tax * multiplier)} ${currency}</span>
     </div>`
   ).join('');
 
@@ -60,7 +63,7 @@ function taxBreakdownHTML(gross, tax, panelVisible, toggleFn, currency = '◆') 
       <div class="tb-head">Tax Breakdown</div>
       ${rows}
       <div class="tb-row tb-total">
-        <span>Total Tax</span><span class="tb-amt">${fmt(tax)} ${currency}</span>
+        <span>Total Tax</span><span class="tb-amt">${fmt(totalTax)} ${currency}</span>
       </div>
     </div>`;
 }
@@ -74,10 +77,12 @@ function calculate() {
 
   const dismantleGross = dismantleAmt * coinPrice;
 
-  // Direct sale: convert Diamonds → Crystals first, then tax is applied on the crystal value
-  const directGrossCrystals = directPrice * DIAMOND_TO_CRYSTAL;
-  const directTax            = calcTax(directGrossCrystals);
-  const directNetCrystals    = directGrossCrystals - directTax;
+  // Direct sale: tax brackets are applied on the Diamond value,
+  // then the tax and gross are both converted to Crystals for display.
+  const directGrossCrystals = directPrice * DIAMOND_TO_CRYSTAL;          // 50k ◆ → 500k ✦
+  const directTaxDiamonds   = calcTax(directPrice);                       // e.g. 5,000 ◆
+  const directTax           = directTaxDiamonds * DIAMOND_TO_CRYSTAL;     // → 50,000 ✦
+  const directNetCrystals   = directGrossCrystals - directTax;            // → 450,000 ✦
 
   // Dismantle: coins sell directly for Crystals, tax applied on crystal value
   const dismantleTax         = calcTax(dismantleGross);
@@ -151,7 +156,7 @@ function calculate() {
         <span class="rc-key">Net Crystals</span>
         <span class="rc-val net-gold">${fmt(directNetCrystals)} ✦</span>
       </div>
-      ${taxBreakdownHTML(directGrossCrystals, directTax, showTaxDirect, 'toggleTaxDirect', '✦')}
+      ${taxBreakdownHTML(directPrice, directTax, showTaxDirect, 'toggleTaxDirect', '✦', DIAMOND_TO_CRYSTAL)}
     </div>`;
   } else {
     directCardHTML = `<div class="result-card">
