@@ -6,27 +6,44 @@
 const DIAMOND_TO_CRYSTAL = 10;
 
 // ── Tax Brackets ──────────────────────────────────────────────────────────────
-// Progressive/marginal EC market tax (amounts in Diamonds ◆).
-const TAX_BRACKETS = [
+
+// Direct Sale brackets — applied on the Diamond (◆) listing price.
+const DIRECT_BRACKETS = [
   { floor:      0, ceil:   50000, rate: 0.10, label: '0 – 50,000'          },
   { floor:  50000, ceil:  100000, rate: 0.20, label: '50,001 – 100,000'    },
   { floor: 100000, ceil:  200000, rate: 0.30, label: '100,001 – 200,000'   },
   { floor: 200000, ceil: Infinity, rate: 0.40, label: 'Above 200,000'      },
 ];
 
-function calcTax(gross) {
+// Dismantle & Sell brackets — applied on the Crystal (✦) transaction total.
+const DISMANTLE_BRACKETS = {
+  standard: [
+    { floor:       0, ceil:   500000, rate: 0.05, label: '0 – 500,000'            },
+    { floor:  500000, ceil:  1500000, rate: 0.10, label: '500,001 – 1,500,000'    },
+    { floor: 1500000, ceil:  2500000, rate: 0.15, label: '1,500,001 – 2,500,000'  },
+    { floor: 2500000, ceil: Infinity, rate: 0.15, label: 'Above 2,500,000'        },
+  ],
+  vip: [
+    { floor:       0, ceil:   500000, rate: 0.05, label: '0 – 500,000'            },
+    { floor:  500000, ceil:  1500000, rate: 0.05, label: '500,001 – 1,500,000'    },
+    { floor: 1500000, ceil:  2500000, rate: 0.10, label: '1,500,001 – 2,500,000'  },
+    { floor: 2500000, ceil: Infinity, rate: 0.15, label: 'Above 2,500,000'        },
+  ],
+};
+
+function calcTax(brackets, gross) {
   if (!gross || gross <= 0) return 0;
   let tax = 0;
-  for (const { floor, ceil, rate } of TAX_BRACKETS) {
+  for (const { floor, ceil, rate } of brackets) {
     if (gross <= floor) break;
     tax += (Math.min(gross, ceil) - floor) * rate;
   }
   return Math.round(tax);
 }
 
-function getTaxTiers(gross) {
+function getTaxTiers(brackets, gross) {
   const tiers = [];
-  for (const { floor, ceil, rate, label } of TAX_BRACKETS) {
+  for (const { floor, ceil, rate, label } of brackets) {
     if (gross <= floor) break;
     const slice = Math.min(gross, ceil) - floor;
     tiers.push({ label, slice, rate, tax: Math.round(slice * rate) });
@@ -41,16 +58,19 @@ const fmtPct = r => `${(r * 100).toFixed(0)}%`;
 // ── State ─────────────────────────────────────────────────────────────────────
 let showTaxDirect    = false;
 let showTaxDismantle = false;
+let vipCard          = false;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-// grossDiamonds  — value in ◆ used to compute bracket slices
-// totalTax       — pre-calculated total tax in display currency
-// multiplier     — converts each bracket's ◆ tax into display currency (1 for ✦ dismantle, DIAMOND_TO_CRYSTAL for ✦ direct sale)
-function taxBreakdownHTML(grossDiamonds, totalTax, panelVisible, toggleFn, currency = '◆', multiplier = 1) {
+// brackets   — which bracket table to slice against
+// gross      — raw value in the bracket's currency
+// totalTax   — pre-calculated total tax (in display currency)
+// multiplier — scale each bracket slice's tax for display (e.g. ×10 for direct sale ◆→✦)
+// currency   — symbol shown after amounts
+function taxBreakdownHTML(brackets, gross, totalTax, panelVisible, toggleFn, currency = '✦', multiplier = 1) {
   const btn = `<button class="tax-toggle" onclick="${toggleFn}()">${panelVisible ? '▲ Hide' : '▼ Show'} tax breakdown</button>`;
   if (!panelVisible) return btn;
 
-  const tiers = getTaxTiers(grossDiamonds);
+  const tiers = getTaxTiers(brackets, gross);
   const rows  = tiers.map(t =>
     `<div class="tb-row">
       <span class="tb-tier">${t.label} &times; ${fmtPct(t.rate)}</span>
@@ -77,15 +97,15 @@ function calculate() {
 
   const dismantleGross = dismantleAmt * coinPrice;
 
-  // Direct sale: tax brackets are applied on the Diamond value,
-  // then the tax and gross are both converted to Crystals for display.
-  const directGrossCrystals = directPrice * DIAMOND_TO_CRYSTAL;          // 50k ◆ → 500k ✦
-  const directTaxDiamonds   = calcTax(directPrice);                       // e.g. 5,000 ◆
-  const directTax           = directTaxDiamonds * DIAMOND_TO_CRYSTAL;     // → 50,000 ✦
-  const directNetCrystals   = directGrossCrystals - directTax;            // → 450,000 ✦
+  // Direct sale: tax brackets applied on the Diamond (◆) value, then converted to ✦.
+  const directGrossCrystals = directPrice * DIAMOND_TO_CRYSTAL;
+  const directTaxDiamonds   = calcTax(DIRECT_BRACKETS, directPrice);
+  const directTax           = directTaxDiamonds * DIAMOND_TO_CRYSTAL;
+  const directNetCrystals   = directGrossCrystals - directTax;
 
-  // Dismantle: coins sell directly for Crystals, tax applied on crystal value
-  const dismantleTax         = calcTax(dismantleGross);
+  // Dismantle: coins sell natively in ✦; use the correct bracket set based on VIP status.
+  const dismantleBrackets    = vipCard ? DISMANTLE_BRACKETS.vip : DISMANTLE_BRACKETS.standard;
+  const dismantleTax         = calcTax(dismantleBrackets, dismantleGross);
   const dismantleNetCrystals = dismantleGross - dismantleTax;
 
   const out = document.getElementById('giResults');
@@ -156,7 +176,7 @@ function calculate() {
         <span class="rc-key">Net Crystals</span>
         <span class="rc-val net-gold">${fmt(directNetCrystals)} ✦</span>
       </div>
-      ${taxBreakdownHTML(directPrice, directTax, showTaxDirect, 'toggleTaxDirect', '✦', DIAMOND_TO_CRYSTAL)}
+      ${taxBreakdownHTML(DIRECT_BRACKETS, directPrice, directTax, showTaxDirect, 'toggleTaxDirect', '✦', DIAMOND_TO_CRYSTAL)}
     </div>`;
   } else {
     directCardHTML = `<div class="result-card">
@@ -171,7 +191,7 @@ function calculate() {
     const winClass  = dismantleWins ? 'win-dismantle' : '';
     const winBadge  = dismantleWins ? '<span class="rc-win-badge">Best Option</span>' : '';
     dismantleCardHTML = `<div class="result-card ${winClass}">
-      <div class="rc-title">🔨 Dismantle &amp; Sell ${winBadge}</div>
+      <div class="rc-title">🔨 Dismantle &amp; Sell ${winBadge}<span style="font-weight:400;font-size:.65rem;text-transform:none;letter-spacing:0;margin-left:auto;color:var(--muted)">${vipCard ? 'VIP Rate' : 'Standard Rate'}</span></div>
       <div class="rc-row">
         <span class="rc-key">Coins Received</span>
         <span class="rc-val">${fmt(dismantleAmt)} <span class="dim" style="font-size:.78rem;font-weight:400">${coinType}</span></span>
@@ -192,7 +212,7 @@ function calculate() {
         <span class="rc-key">Net Crystals</span>
         <span class="rc-val net-green">${fmt(dismantleNetCrystals)} ✦</span>
       </div>
-      ${taxBreakdownHTML(dismantleGross, dismantleTax, showTaxDismantle, 'toggleTaxDismantle', '✦')}
+      ${taxBreakdownHTML(dismantleBrackets, dismantleGross, dismantleTax, showTaxDismantle, 'toggleTaxDismantle', '✦')}
     </div>`;
   } else {
     dismantleCardHTML = `<div class="result-card">
@@ -207,6 +227,13 @@ function calculate() {
 // ── Toggle Tax Panels ─────────────────────────────────────────────────────────
 function toggleTaxDirect()    { showTaxDirect    = !showTaxDirect;    calculate(); }
 function toggleTaxDismantle() { showTaxDismantle = !showTaxDismantle; calculate(); }
+
+function setVip(on) {
+  vipCard = on;
+  document.getElementById('tabStandard').classList.toggle('active', !on);
+  document.getElementById('tabVip').classList.toggle('active',  on);
+  calculate();
+}
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 loadTheme();
