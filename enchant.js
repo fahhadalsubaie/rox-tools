@@ -171,21 +171,7 @@ function setCategory(btn) {
   category = btn.dataset.category;
   document.querySelectorAll('#categoryBtns .btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const sub = document.getElementById('weaponSubSelector');
-  if (category === 'Weapon') {
-    sub.style.display = '';
-    equip = document.querySelector('#weaponTypeBtns .btn.active').dataset.equip;
-  } else {
-    sub.style.display = 'none';
-    equip = category;
-  }
-  calculate();
-}
-
-function setWeaponType(btn) {
-  equip = btn.dataset.equip;
-  document.querySelectorAll('#weaponTypeBtns .btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  equip = category === 'Weapon' ? 'Off Hand' : category;
   calculate();
 }
 
@@ -247,11 +233,8 @@ function calculate() {
   const mix = optimalMix(levels);
 
   // Range label
-  const categoryLabel = category === 'Weapon'
-    ? `Weapon <span class="range-equip-detail">(enchanting with ${equip})</span>`
-    : equip;
   const rangeHTML = `<div class="range-label">
-    <strong>${categoryLabel}</strong><span class="range-sep">|</span>
+    <strong>${category}</strong><span class="range-sep">|</span>
     Level <strong>${from}</strong> → Level <strong>${to}</strong>
     <span class="range-sep">|</span>${levels.length} level${levels.length > 1 ? 's' : ''}
     <span class="range-sep">|</span>${totalEXP.toLocaleString()} total EXP
