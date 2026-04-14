@@ -257,10 +257,25 @@ const TIER_EXP = {
   'Pront':1,'Izlude':1,'Morroc':2,'Alberta':4,'Payon':8,'Geffen':16,'Glast Heim':32
 };
 
-// Material consumed per single enchant attempt, by equipment type
+// Equipment-type multipliers relative to 2H Weapon baseline (1.0)
+const ENCHANT_RATIOS = {
+  '2 Hand':    1,      // 100% — baseline
+  '1 Hand':    2/3,    // 66.7%
+  'Dagger':    1/2,    // 50%
+  'Off Hand':  1/3,    // 33.3%
+  'Armor':     1/3,    // 33.3%
+  'Accessory': 1/3,    // 33.3%
+};
+
+// Base materials per attempt for 2H Weapon; all other types scale via ENCHANT_RATIOS
+const BASE_ATT = { pront: 90, other: 6 };
+
+// Derived lookup: materials per attempt by city group and equipment type
+// Pront: 2H=90, 1H=60, Dagger=45, Off Hand/Armor/Accessory=30
+// Other: 2H=6,  1H=4,  Dagger=3,  Off Hand/Armor/Accessory=2
 const ATT = {
-  pront: {'Dagger':45,'Off Hand':30,'1 Hand':60,'2 Hand':90,'Armor':30,'Accessory':30},
-  other: {'Dagger':3, 'Off Hand':2, '1 Hand':4, '2 Hand':6, 'Armor':2, 'Accessory':2}
+  pront: Object.fromEntries(EQUIP_TYPES.map(eq => [eq, BASE_ATT.pront * ENCHANT_RATIOS[eq]])),
+  other: Object.fromEntries(EQUIP_TYPES.map(eq => [eq, BASE_ATT.other * ENCHANT_RATIOS[eq]])),
 };
 
 // Level EXP requirements (incremental)
