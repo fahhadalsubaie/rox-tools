@@ -351,18 +351,12 @@ function toggleTheme() { applyLight(!document.body.classList.contains('light'));
 
 // ── Calculation ───────────────────────────────────────────────────────────────
 
-// Effective EXP for an equipment type — LVL_EXP values are the Off Hand/Armor/Accessory
-// baseline; weapon types scale UP by EXP_SCALE (Off Hand=×1, Dagger=×1.5, 1H=×2, 2H=×3).
-function getEffectiveEXP(eq, reqExp) {
-  return reqExp * EXP_SCALE[eq];
-}
-
-// Materials needed to gain effectiveEXP at a given city.
-// Combined effect: effectiveEXP (ratio) × attCost (ratio) = ratio² vs 2H baseline.
+// Materials needed to reach reqExp at a given city.
+// All equipment types need the same number of attempts (= reqExp).
+// The ENCHANT_RATIOS are already encoded in ATT (per-attempt cost only).
 function getMat(city, eq, reqExp) {
-  const effectiveExp = getEffectiveEXP(eq, reqExp);
   const attCost = city === 'Pront' ? ATT.pront[eq] : ATT.other[eq];
-  return effectiveExp * attCost / TIER_EXP[city];
+  return reqExp * attCost / TIER_EXP[city];
 }
 
 // Price per unit of material (Muspellium or stone)
@@ -519,8 +513,7 @@ function calculate() {
 
   const levels = [];
   for (let l = from+1; l <= to; l++) levels.push(l);
-  // totalEXP is scaled for the selected equipment type (2H is the baseline)
-  const totalEXP = levels.reduce((s,l) => s + getEffectiveEXP(equip, LVL_EXP[l]), 0);
+  const totalEXP = levels.reduce((s,l) => s + LVL_EXP[l], 0);
 
   // Per-city totals
   const totals = {};
@@ -590,9 +583,8 @@ function calculate() {
   </tr></thead><tbody>`;
 
   levels.forEach((lvl, i) => {
-    const exp = LVL_EXP[lvl];                          // 2H baseline EXP
-    const effExp = getEffectiveEXP(equip, exp);        // scaled for selected equipment
-    tbl += `<tr><td>${lvl-1} → ${lvl}</td><td>${Number.isInteger(effExp) ? effExp.toLocaleString() : effExp.toLocaleString(undefined,{maximumFractionDigits:2})}</td>`;
+    const exp = LVL_EXP[lvl];
+    tbl += `<tr><td>${lvl-1} → ${lvl}</td><td>${exp.toLocaleString()}</td>`;
     if (isCrystal) {
       const m = mix.perLvl[i];
       tbl += m?.cost!=null
