@@ -37,7 +37,7 @@ function loadPrices() {
 // Total materials to accumulate reqExp at a given city.
 // Formula: EXP_needed × type_ratio × stones_per_exp
 function getMat(city, eq, reqExp) {
-  return reqExp * ENCHANT_RATIOS[eq] * STONES_PER_EXP[city];
+  return reqExp * STONES_PER_EXP[city];
 }
 
 function getPrice(city, eq) {
