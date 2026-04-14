@@ -43,7 +43,7 @@ let showTaxDirect    = false;
 let showTaxDismantle = false;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function taxBreakdownHTML(gross, tax, panelVisible, toggleFn) {
+function taxBreakdownHTML(gross, tax, panelVisible, toggleFn, currency = '◆') {
   const btn = `<button class="tax-toggle" onclick="${toggleFn}()">${panelVisible ? '▲ Hide' : '▼ Show'} tax breakdown</button>`;
   if (!panelVisible) return btn;
 
@@ -51,7 +51,7 @@ function taxBreakdownHTML(gross, tax, panelVisible, toggleFn) {
   const rows  = tiers.map(t =>
     `<div class="tb-row">
       <span class="tb-tier">${t.label} &times; ${fmtPct(t.rate)}</span>
-      <span class="tb-amt">${fmt(t.tax)} ◆</span>
+      <span class="tb-amt">${fmt(t.tax)} ${currency}</span>
     </div>`
   ).join('');
 
@@ -60,7 +60,7 @@ function taxBreakdownHTML(gross, tax, panelVisible, toggleFn) {
       <div class="tb-head">Tax Breakdown</div>
       ${rows}
       <div class="tb-row tb-total">
-        <span>Total Tax</span><span class="tb-amt">${fmt(tax)} ◆</span>
+        <span>Total Tax</span><span class="tb-amt">${fmt(tax)} ${currency}</span>
       </div>
     </div>`;
 }
@@ -87,11 +87,11 @@ function calculate() {
     return;
   }
 
-  // Convert direct sale net to crystals (10 ◆ = 200 ✦, so ×20)
+  // Direct sale pays in Diamonds → convert to Crystals (10 ◆ = 200 ✦, so ×20)
   const directNetCrystals = directNet * DIAMOND_TO_CRYSTAL;
 
-  // Normalize dismantle to crystals for a fair verdict comparison
-  const dismantleNetCrystals = dismantleNet * DIAMOND_TO_CRYSTAL;
+  // Dismantle path sells coins directly for Crystals — no conversion needed
+  const dismantleNetCrystals = dismantleNet;
 
   const bothEntered   = directPrice > 0 && dismantleGross > 0;
   const directWins    = bothEntered && directNetCrystals >= dismantleNetCrystals;
@@ -176,25 +176,21 @@ function calculate() {
       </div>
       <div class="rc-row">
         <span class="rc-key">Coin Market Price</span>
-        <span class="rc-val">${fmt(coinPrice)} ◆ each</span>
+        <span class="rc-val">${fmt(coinPrice)} ✦ each</span>
       </div>
       <div class="rc-row">
         <span class="rc-key">Gross Coin Value</span>
-        <span class="rc-val">${fmt(dismantleGross)} ◆</span>
+        <span class="rc-val">${fmt(dismantleGross)} ✦</span>
       </div>
       <div class="rc-row">
         <span class="rc-key">Market Tax</span>
-        <span class="rc-val deduct">− ${fmt(dismantleTax)} ◆</span>
-      </div>
-      <div class="rc-row">
-        <span class="rc-key">Post-Tax Diamonds</span>
-        <span class="rc-val dim">${fmt(dismantleNet)} ◆</span>
+        <span class="rc-val deduct">− ${fmt(dismantleTax)} ✦</span>
       </div>
       <div class="rc-row total-row">
-        <span class="rc-key">Net Crystals <span style="font-weight:400;font-size:.68rem">(×20)</span></span>
+        <span class="rc-key">Net Crystals</span>
         <span class="rc-val net-green">${fmt(dismantleNetCrystals)} ✦</span>
       </div>
-      ${taxBreakdownHTML(dismantleGross, dismantleTax, showTaxDismantle, 'toggleTaxDismantle')}
+      ${taxBreakdownHTML(dismantleGross, dismantleTax, showTaxDismantle, 'toggleTaxDismantle', '✦')}
     </div>`;
   } else {
     dismantleCardHTML = `<div class="result-card">
