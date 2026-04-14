@@ -145,7 +145,7 @@ function calculate() {
         <span class="rc-val">${fmt(directPrice)} ◆</span>
       </div>
       <div class="rc-row">
-        <span class="rc-key">Converted to Crystals <span style="font-weight:400;font-size:.68rem">(×20)</span></span>
+        <span class="rc-key">Converted to Crystals <span style="font-weight:400;font-size:.68rem">(×10)</span></span>
         <span class="rc-val">${fmt(directGrossCrystals)} ✦</span>
       </div>
       <div class="rc-row">
