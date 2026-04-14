@@ -1,5 +1,10 @@
 'use strict';
 
+// ── Conversion ────────────────────────────────────────────────────────────────
+// Selling a gold item on the EC pays out in Diamonds, which convert to Crystals.
+// Rate: 10 Diamonds = 200 Crystals → 1 Diamond = 20 Crystals.
+const DIAMOND_TO_CRYSTAL = 20;
+
 // ── Tax Brackets ──────────────────────────────────────────────────────────────
 // Progressive/marginal EC market tax (amounts in Diamonds ◆).
 const TAX_BRACKETS = [
@@ -82,21 +87,27 @@ function calculate() {
     return;
   }
 
-  const bothEntered    = directPrice > 0 && dismantleGross > 0;
-  const directWins     = bothEntered && directNet >= dismantleNet;
-  const dismantleWins  = bothEntered && dismantleNet > directNet;
+  // Convert direct sale net to crystals (10 ◆ = 200 ✦, so ×20)
+  const directNetCrystals = directNet * DIAMOND_TO_CRYSTAL;
+
+  // Normalize dismantle to crystals for a fair verdict comparison
+  const dismantleNetCrystals = dismantleNet * DIAMOND_TO_CRYSTAL;
+
+  const bothEntered   = directPrice > 0 && dismantleGross > 0;
+  const directWins    = bothEntered && directNetCrystals >= dismantleNetCrystals;
+  const dismantleWins = bothEntered && dismantleNetCrystals > directNetCrystals;
 
   // ── Verdict ──
   let verdictHTML = '';
   if (bothEntered) {
-    const diff = Math.abs(directNet - dismantleNet);
+    const diffCrystals = Math.abs(directNetCrystals - dismantleNetCrystals);
     if (directWins) {
       verdictHTML = `<div class="verdict win-direct">
         <div class="verdict-icon">💰</div>
         <div class="verdict-body">
           <div class="verdict-label">Recommendation</div>
           <div class="verdict-action">Sell Directly on the Exchange</div>
-          <div class="verdict-diff">Nets <strong>${fmt(diff)} ◆ more</strong> than the dismantle path</div>
+          <div class="verdict-diff">Nets <strong>${fmt(diffCrystals)} ✦ more</strong> than the dismantle path</div>
         </div>
       </div>`;
     } else if (dismantleWins) {
@@ -105,7 +116,7 @@ function calculate() {
         <div class="verdict-body">
           <div class="verdict-label">Recommendation</div>
           <div class="verdict-action">Dismantle &amp; Sell the Coins</div>
-          <div class="verdict-diff">Nets <strong>${fmt(diff)} ◆ more</strong> than a direct listing</div>
+          <div class="verdict-diff">Nets <strong>${fmt(diffCrystals)} ✦ more</strong> than a direct listing</div>
         </div>
       </div>`;
     } else {
@@ -123,8 +134,8 @@ function calculate() {
   // ── Direct Sale Card ──
   let directCardHTML;
   if (directPrice > 0) {
-    const winClass  = directWins ? 'win-direct' : '';
-    const winBadge  = directWins ? '<span class="rc-win-badge gold-badge">Best Option</span>' : '';
+    const winClass = directWins ? 'win-direct' : '';
+    const winBadge = directWins ? '<span class="rc-win-badge gold-badge">Best Option</span>' : '';
     directCardHTML = `<div class="result-card ${winClass}">
       <div class="rc-title">💰 Direct Sale ${winBadge}</div>
       <div class="rc-row">
@@ -135,9 +146,13 @@ function calculate() {
         <span class="rc-key">Market Tax</span>
         <span class="rc-val deduct">− ${fmt(directTax)} ◆</span>
       </div>
+      <div class="rc-row">
+        <span class="rc-key">Post-Tax Diamonds</span>
+        <span class="rc-val dim">${fmt(directNet)} ◆</span>
+      </div>
       <div class="rc-row total-row">
-        <span class="rc-key">Net Proceeds</span>
-        <span class="rc-val net-gold">${fmt(directNet)} ◆</span>
+        <span class="rc-key">Net Crystals <span style="font-weight:400;font-size:.68rem">(×20)</span></span>
+        <span class="rc-val net-gold">${fmt(directNetCrystals)} ✦</span>
       </div>
       ${taxBreakdownHTML(directPrice, directTax, showTaxDirect, 'toggleTaxDirect')}
     </div>`;
@@ -171,9 +186,13 @@ function calculate() {
         <span class="rc-key">Market Tax</span>
         <span class="rc-val deduct">− ${fmt(dismantleTax)} ◆</span>
       </div>
+      <div class="rc-row">
+        <span class="rc-key">Post-Tax Diamonds</span>
+        <span class="rc-val dim">${fmt(dismantleNet)} ◆</span>
+      </div>
       <div class="rc-row total-row">
-        <span class="rc-key">Net Proceeds</span>
-        <span class="rc-val net-green">${fmt(dismantleNet)} ◆</span>
+        <span class="rc-key">Net Crystals <span style="font-weight:400;font-size:.68rem">(×20)</span></span>
+        <span class="rc-val net-green">${fmt(dismantleNetCrystals)} ✦</span>
       </div>
       ${taxBreakdownHTML(dismantleGross, dismantleTax, showTaxDismantle, 'toggleTaxDismantle')}
     </div>`;
