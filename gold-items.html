@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROX Next Gen — Gold Item Advisor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <button id="themeBtn" onclick="toggleTheme()">☀️ Light</button>
+  <h1>ROX NEXT GENERATION</h1>
+  <p class="hdr-sub">Gold Item Advisor</p>
+  <p class="hdr-credits">by <strong>Kyoshio</strong> &mdash; 1002 فرعون</p>
+</header>
+
+<nav class="page-nav">
+  <a href="index.html"       class="nav-link">⚗️ Enchant Calculator</a>
+  <a href="gold-items.html"  class="nav-link active">💰 Gold Item Advisor</a>
+</nav>
+
+<main>
+
+  <!-- Inputs -->
+  <div class="card">
+    <div class="card-title">⚙️ Item Details</div>
+    <div class="gi-inputs">
+      <div class="gi-field">
+        <label class="gi-label" for="directPrice">
+          EC Listing Price <em>(◆ Diamonds)</em>
+        </label>
+        <input class="gi-input" type="number" id="directPrice"
+               min="1" max="5000000" step="1" placeholder="e.g. 500000">
+      </div>
+      <div class="gi-field">
+        <label class="gi-label" for="coinType">Coin Type from Dismantling</label>
+        <select class="gi-select" id="coinType">
+          <option value="Mini Coin">Mini Coin</option>
+          <option value="MVP Coin">MVP Coin</option>
+          <option value="Corporation Coin">Corporation Coin</option>
+        </select>
+      </div>
+      <div class="gi-field">
+        <label class="gi-label" for="dismantleAmt">Coins Received</label>
+        <input class="gi-input" type="number" id="dismantleAmt"
+               min="1" max="5000000" step="1" placeholder="e.g. 10">
+      </div>
+      <div class="gi-field">
+        <label class="gi-label" for="coinPrice">
+          Coin Market Price <em>(◆ each)</em>
+        </label>
+        <input class="gi-input" type="number" id="coinPrice"
+               min="1" max="5000000" step="1" placeholder="e.g. 50000">
+      </div>
+    </div>
+    <p class="price-note">◆ = Diamonds &nbsp;|&nbsp; All values refer to Exchange (EC) transactions subject to progressive market tax.</p>
+  </div>
+
+  <!-- Results -->
+  <div class="card">
+    <div class="card-title">📊 Comparison</div>
+    <div id="giResults"><p class="empty">Enter values above to see the comparison.</p></div>
+  </div>
+
+  <!-- Tax Reference -->
+  <div class="card">
+    <div class="card-title">📋 Market Tax Brackets</div>
+    <table class="ref-table" style="display:table;max-width:440px">
+      <thead>
+        <tr><th>Sale Amount</th><th>Tax Rate</th><th>Max Tax in Bracket</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>0 – 50,000 ◆</td>          <td>10%</td><td>5,000 ◆</td></tr>
+        <tr><td>50,001 – 100,000 ◆</td>    <td>20%</td><td>10,000 ◆</td></tr>
+        <tr><td>100,001 – 200,000 ◆</td>   <td>30%</td><td>30,000 ◆</td></tr>
+        <tr><td>Above 200,000 ◆</td>        <td>40%</td><td>Uncapped</td></tr>
+      </tbody>
+    </table>
+    <p class="price-note" style="margin-top:.8rem">
+      Tax is marginal — only the portion of the sale within each bracket is taxed at that bracket's rate.<br>
+      Maximum combined tax on amounts up to 200,000 ◆ is 45,000 ◆.
+    </p>
+  </div>
+
+</main>
+
+<footer style="max-width:1320px;margin:0 auto 2rem;padding:1.2rem 1.5rem 0;font-size:.72rem;color:var(--muted);line-height:1.75;border-top:1px solid var(--border)">
+  <p style="margin-bottom:.35rem;font-weight:700;color:var(--text);font-size:.74rem;text-transform:uppercase;letter-spacing:.08em">Disclaimer</p>
+  <p>This tool is an independent, fan-made calculator and is <strong>not affiliated with, endorsed by, or associated with Gravity Co., Ltd.</strong>, Gravity Game Hub, or any of their subsidiaries or partners. <em>ROX: Next Generation</em> and all related names, characters, and game content are trademarks and intellectual property of Gravity Co., Ltd. All game data is derived from publicly observable in-game information for non-commercial, informational purposes only.</p>
+  <p style="margin-top:.45rem">The author assumes no responsibility for decisions made based on this tool.</p>
+  <p style="margin-top:.75rem;color:var(--border);font-size:.67rem">&copy; 2026 Kyoshio &mdash; 1002 فرعون &nbsp;|&nbsp; Not affiliated with Gravity Co., Ltd.</p>
+</footer>
+
+<script src="shared.js"></script>
+<script src="gold.js"></script>
+</body>
+</html>
