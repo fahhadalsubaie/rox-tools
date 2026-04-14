@@ -53,8 +53,15 @@
         <input class="gi-input" type="number" id="coinPrice"
                min="1" max="5000000" step="1" placeholder="e.g. 50000">
       </div>
+      <div class="gi-field">
+        <label class="gi-label">VIP Card</label>
+        <div class="mode-tabs" style="max-width:180px">
+          <button class="mode-tab active" id="tabStandard" onclick="setVip(false)">Standard</button>
+          <button class="mode-tab"        id="tabVip"      onclick="setVip(true)">VIP Card</button>
+        </div>
+      </div>
     </div>
-    <p class="price-note">◆ = Diamonds &nbsp;|&nbsp; ✦ = Crystals &nbsp;|&nbsp; Selling a gold item on the EC pays out in Diamonds, which convert to Crystals at 1 ◆ = 10 ✦.</p>
+    <p class="price-note">◆ = Diamonds &nbsp;|&nbsp; ✦ = Crystals &nbsp;|&nbsp; Direct sale: 1 ◆ = 10 ✦. VIP Card reduces Dismantle tax in upper brackets.</p>
   </div>
 
   <!-- Results -->
