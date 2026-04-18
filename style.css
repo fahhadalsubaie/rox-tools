@@ -187,6 +187,45 @@ select:focus{outline:none;border-color:var(--gold)}
 .tb-amt{font-weight:600;font-size:.78rem}
 .tb-total{border-top:2px solid var(--border) !important;margin-top:.35rem;padding-top:.45rem !important;font-weight:700;color:var(--gold)}
 
+/* ── Event Tracker ────────────────────────────────────────────────────────── */
+
+/* Dual clocks */
+.clocks-row{display:flex;align-items:stretch;gap:1rem;flex-wrap:wrap}
+.clock-card{flex:1;min-width:210px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.5rem;display:flex;flex-direction:column;gap:.35rem;transition:background .2s,border-color .2s}
+.clock-sep{display:flex;align-items:center;color:var(--muted);font-size:1.2rem;flex:0 0 auto;padding:0 .15rem}
+.clock-label{font-size:.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.tz-pill{font-size:.62rem;font-weight:600;background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:.1rem .5rem;color:var(--muted);letter-spacing:0;text-transform:none;transition:background .2s}
+.clock-time{font-size:2.4rem;font-weight:900;letter-spacing:.04em;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1}
+.clock-date{font-size:.74rem;color:var(--muted)}
+
+/* Event grid */
+.ev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.ev-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.3rem;display:flex;flex-direction:column;gap:.9rem;transition:border-color .2s,box-shadow .2s}
+.ev-card.ev-live{border-color:var(--green);box-shadow:0 0 0 1px var(--green-dim),0 0 18px rgba(76,222,143,.07)}
+
+/* Card header */
+.ev-header{display:flex;align-items:center;gap:.6rem}
+.ev-icon{font-size:1.4rem;line-height:1;flex:0 0 auto}
+.ev-title{flex:1;display:flex;align-items:baseline;gap:.4rem;flex-wrap:wrap}
+.ev-name{font-size:.9rem;font-weight:800;color:var(--text)}
+.ev-tag{font-size:.57rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:.1rem .38rem;color:var(--muted)}
+
+/* Live pill */
+.live-pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:rgba(76,222,143,.13);color:var(--green);border:1px solid var(--green-dim);border-radius:999px;padding:.18rem .52rem;white-space:nowrap;flex:0 0 auto}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex:0 0 auto;animation:livePulse 1.2s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.65)}}
+
+/* Card body rows */
+.ev-rows{display:flex;flex-direction:column}
+.ev-row{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.34rem 0;border-bottom:1px solid var(--divider)}
+.ev-row:last-child{border-bottom:none;border-top:2px solid var(--border);padding-top:.5rem;margin-top:.15rem}
+.ev-key{font-size:.74rem;color:var(--muted);flex-shrink:0}
+.ev-val{font-size:.83rem;font-weight:600;color:var(--text);text-align:right;display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;justify-content:flex-end}
+.ev-val.mono{font-variant-numeric:tabular-nums}
+.ev-daynote{font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:.05rem .3rem}
+.ev-countdown{color:var(--gold);font-weight:800;font-variant-numeric:tabular-nums}
+.ev-cd-live{color:var(--green) !important}
+
 /* ── Misc ─────────────────────────────────────────────────────────────────── */
 .empty{color:var(--muted);font-size:.85rem;padding:1rem 0}
 .warn{color:var(--warn);font-size:.85rem;padding:.5rem 0}
@@ -203,6 +242,10 @@ select:focus{outline:none;border-color:var(--gold)}
   .summary-grid{grid-template-columns:repeat(auto-fill,minmax(98px,1fr))}
   .mix-cost{font-size:1.5rem}
   .gi-inputs{grid-template-columns:1fr 1fr}
+  .clocks-row{flex-direction:column}
+  .clock-sep{display:none}
+  .clock-time{font-size:1.9rem}
+  .ev-grid{grid-template-columns:1fr}
 }
 @media(max-width:420px){
   .gi-inputs{grid-template-columns:1fr}
