@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ROX Next Gen — Event Tracker</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
@@ -22,6 +22,20 @@
 </nav>
 
 <main>
+
+  <!-- Alert Sound -->
+  <div class="card alert-bar">
+    <div class="alert-bar-inner">
+      <div class="alert-bar-info">
+        <span class="alert-icon">🔔</span>
+        <div>
+          <div class="alert-bar-title">Event Alert Sound</div>
+          <div class="alert-bar-sub">Plays automatically when an event goes live. Browser must have been interacted with first.</div>
+        </div>
+      </div>
+      <button class="alert-preview-btn" onclick="previewSound()">▶ Preview Sound</button>
+    </div>
+  </div>
 
   <!-- Live Clocks -->
   <div class="card">
@@ -56,7 +70,7 @@
   <p style="margin-top:.75rem;color:var(--border);font-size:.67rem">&copy; 2026 Kyoshio &mdash; 1002 فرعون &nbsp;|&nbsp; Not affiliated with Gravity Co., Ltd.</p>
 </footer>
 
-<script src="shared.js"></script>
-<script src="events.js"></script>
+<script src="assets/js/shared.js"></script>
+<script src="assets/js/events.js"></script>
 </body>
 </html>
