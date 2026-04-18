@@ -205,7 +205,7 @@ select:focus{outline:none;border-color:var(--gold)}
 .alert-icon{font-size:1.3rem;flex:0 0 auto}
 .alert-bar-title{font-size:.8rem;font-weight:700;color:var(--text)}
 .alert-bar-sub{font-size:.7rem;color:var(--muted);margin-top:.1rem}
-.alert-preview-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.78rem;font-weight:700;padding:.45rem 1rem;cursor:pointer;transition:all .15s;white-space:nowrap;flex:0 0 auto}
+.alert-preview-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.78rem;font-weight:700;padding:.45rem 1rem;cursor:pointer;transition:all .15s;white-space:nowrap;flex:0 0 auto;min-width:140px;text-align:center}
 .alert-preview-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
 
 /* Event grid — auto-fit + justify-content:center keeps cards centered */
