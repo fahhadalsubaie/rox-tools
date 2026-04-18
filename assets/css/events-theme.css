@@ -1,0 +1,290 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   Ragnarok Event Tracker Theme
+   Scoped entirely to body.events-page — does not affect other pages.
+══════════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&display=swap');
+
+/* ── Token overrides ─────────────────────────────────────────────────────── */
+body.events-page {
+  --rg-gold:      #e8c050;
+  --rg-gold-dim:  #5a3d08;
+  --rg-gold-glow: rgba(232,192,80,.35);
+  --rg-red:       #d94422;
+  --rg-red-glow:  rgba(217,68,34,.32);
+  --rg-purple:    #7755cc;
+  --rg-deep:      #080612;
+  --rg-surface:   #120e20;
+  --rg-border:    #2a1d48;
+}
+
+/* ── Background atmosphere ───────────────────────────────────────────────── */
+body.events-page {
+  background: var(--rg-deep);
+}
+
+body.events-page main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ambient glow blobs — fixed so they don't scroll */
+body.events-page main::before,
+body.events-page main::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(90px);
+}
+body.events-page main::before {
+  width: 500px; height: 380px;
+  top: 5%; left: -120px;
+  background: rgba(119,85,204,.07);
+}
+body.events-page main::after {
+  width: 420px; height: 360px;
+  bottom: 15%; right: -100px;
+  background: rgba(217,68,34,.05);
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+body.events-page header {
+  background: linear-gradient(160deg, #0c0820 0%, #140d28 60%, #0c0614 100%);
+  border-bottom-color: var(--rg-gold-dim);
+  box-shadow: 0 2px 40px rgba(0,0,0,.6);
+}
+
+body.events-page header h1 {
+  text-shadow: 0 0 40px var(--rg-gold-glow), 0 2px 4px rgba(0,0,0,.8);
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+body.events-page .card {
+  background: linear-gradient(160deg, #160e2a 0%, #0e0a1c 100%);
+  border-color: var(--rg-border);
+  box-shadow: 0 4px 32px rgba(0,0,0,.5), inset 0 1px 0 rgba(232,192,80,.06);
+  position: relative;
+  overflow: hidden;
+}
+
+/* top shimmer line on every card */
+body.events-page .card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 8%; right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rg-gold-dim), transparent);
+  pointer-events: none;
+}
+
+body.events-page .card-title {
+  font-family: 'Cinzel', serif;
+  font-size: .72rem;
+  letter-spacing: .22em;
+  color: var(--rg-gold) !important;
+  border-bottom-color: var(--rg-border) !important;
+  text-shadow: 0 0 18px var(--rg-gold-glow);
+}
+
+/* ── Alert / Battle Horn bar ─────────────────────────────────────────────── */
+body.events-page .alert-bar {
+  border-left: 3px solid var(--rg-gold) !important;
+}
+body.events-page .alert-bar-title {
+  font-family: 'Cinzel', serif;
+  font-size: .82rem;
+  color: var(--rg-gold) !important;
+  letter-spacing: .08em;
+}
+body.events-page .alert-bar-sub {
+  color: rgba(200,185,255,.5) !important;
+}
+body.events-page .alert-icon {
+  filter: drop-shadow(0 0 6px rgba(232,192,80,.5));
+}
+body.events-page .alert-preview-btn {
+  font-family: 'Cinzel', serif;
+  letter-spacing: .06em;
+  background: rgba(232,192,80,.08) !important;
+  border-color: var(--rg-gold-dim) !important;
+  color: var(--rg-gold) !important;
+}
+body.events-page .alert-preview-btn:hover {
+  background: rgba(232,192,80,.16) !important;
+  border-color: var(--rg-gold) !important;
+  box-shadow: 0 0 14px var(--rg-gold-glow);
+}
+
+/* ── Realm Clocks ────────────────────────────────────────────────────────── */
+body.events-page .clock-card {
+  background: linear-gradient(145deg, #1c1030 0%, #110c1e 100%) !important;
+  border-color: var(--rg-border) !important;
+  box-shadow: inset 0 1px 0 rgba(232,192,80,.07), 0 6px 28px rgba(0,0,0,.5) !important;
+  position: relative;
+}
+
+/* decorative corner runes */
+body.events-page .clock-card::after {
+  content: '✦';
+  position: absolute;
+  bottom: .6rem; right: .8rem;
+  font-size: .65rem;
+  color: var(--rg-gold-dim);
+  pointer-events: none;
+}
+
+body.events-page .clock-label {
+  font-family: 'Cinzel', serif;
+  font-size: .62rem;
+  letter-spacing: .14em;
+  color: rgba(232,192,80,.65) !important;
+}
+body.events-page .tz-pill {
+  background: rgba(232,192,80,.07) !important;
+  border-color: var(--rg-gold-dim) !important;
+  color: rgba(232,192,80,.6) !important;
+}
+body.events-page .clock-time {
+  font-family: 'Cinzel', serif !important;
+  font-size: 2.6rem !important;
+  color: var(--rg-gold) !important;
+  text-shadow: 0 0 28px var(--rg-gold-glow), 0 0 8px rgba(232,192,80,.15);
+  letter-spacing: .05em;
+}
+body.events-page .clock-date {
+  font-family: 'Cinzel', serif;
+  font-size: .7rem;
+  letter-spacing: .08em;
+  color: rgba(232,192,80,.45) !important;
+}
+body.events-page .clock-sep {
+  color: var(--rg-gold-dim);
+  font-size: 1.4rem;
+  opacity: .6;
+}
+
+/* ── Quest / Event Cards ─────────────────────────────────────────────────── */
+body.events-page .ev-card {
+  background: linear-gradient(160deg, #18102e 0%, #0e0a1a 100%) !important;
+  border-color: var(--rg-border) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.4) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+body.events-page .ev-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 12%; right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(232,192,80,.25), transparent);
+  pointer-events: none;
+}
+
+/* ── LIVE / In Battle ── */
+body.events-page .ev-card.ev-live {
+  border-color: var(--rg-red) !important;
+  box-shadow:
+    0 0 32px var(--rg-red-glow),
+    0 0 0 1px rgba(217,68,34,.3),
+    0 4px 20px rgba(0,0,0,.4) !important;
+  animation: rg-battle-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes rg-battle-pulse {
+  0%, 100% {
+    box-shadow: 0 0 32px var(--rg-red-glow), 0 0 0 1px rgba(217,68,34,.3), 0 4px 20px rgba(0,0,0,.4);
+  }
+  50% {
+    box-shadow: 0 0 55px rgba(217,68,34,.5), 0 0 0 1px rgba(217,68,34,.55), 0 4px 20px rgba(0,0,0,.4);
+  }
+}
+
+body.events-page .ev-icon {
+  font-size: 1.8rem !important;
+  filter: drop-shadow(0 0 8px rgba(232,192,80,.35));
+}
+
+body.events-page .ev-name {
+  font-family: 'Cinzel', serif !important;
+  font-size: .95rem !important;
+  color: var(--rg-gold) !important;
+  text-shadow: 0 0 14px var(--rg-gold-glow);
+  letter-spacing: .04em;
+}
+
+body.events-page .ev-tag {
+  font-family: 'Cinzel', serif;
+  font-size: .5rem;
+  background: rgba(232,192,80,.1) !important;
+  border-color: var(--rg-gold-dim) !important;
+  color: rgba(232,192,80,.75) !important;
+  letter-spacing: .1em;
+}
+
+/* ── Live pill ── */
+body.events-page .live-pill {
+  font-family: 'Cinzel', serif;
+  font-size: .58rem;
+  letter-spacing: .14em;
+  background: rgba(217,68,34,.2) !important;
+  color: #ff7755 !important;
+  border-color: rgba(217,68,34,.5) !important;
+  text-shadow: 0 0 8px rgba(255,119,85,.5);
+  box-shadow: 0 0 10px rgba(217,68,34,.2);
+}
+body.events-page .live-dot {
+  background: #ff7755 !important;
+  box-shadow: 0 0 6px #ff7755;
+}
+
+/* ── Row content ── */
+body.events-page .ev-row {
+  border-bottom-color: rgba(42,29,72,.7) !important;
+}
+body.events-page .ev-row:last-child {
+  border-top-color: var(--rg-border) !important;
+}
+body.events-page .ev-key {
+  font-family: 'Cinzel', serif;
+  font-size: .67rem !important;
+  letter-spacing: .1em;
+  color: rgba(232,192,80,.45) !important;
+}
+body.events-page .ev-val {
+  color: rgba(210,200,255,.8) !important;
+  font-size: .82rem !important;
+}
+body.events-page .ev-daynote {
+  background: rgba(119,85,204,.2) !important;
+  border-color: rgba(119,85,204,.4) !important;
+  color: #bb99ff !important;
+}
+
+/* ── Countdown ── */
+body.events-page .ev-countdown {
+  font-family: 'Cinzel', serif !important;
+  font-size: 1.1rem !important;
+  color: var(--rg-gold) !important;
+  text-shadow: 0 0 18px var(--rg-gold-glow);
+  letter-spacing: .04em;
+}
+body.events-page .ev-cd-live {
+  color: #ff7755 !important;
+  text-shadow: 0 0 16px rgba(255,119,85,.55) !important;
+}
+
+/* ── Nav active tab ── */
+body.events-page .nav-link.active {
+  color: var(--rg-gold);
+  border-bottom-color: var(--rg-gold);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  body.events-page .clock-time {
+    font-size: 2rem !important;
+  }
+}

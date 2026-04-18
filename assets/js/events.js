@@ -196,15 +196,15 @@ function renderCards(now) {
           <span class="ev-val">${ev.schedule}</span>
         </div>
         <div class="ev-row">
-          <span class="ev-key">Server Time</span>
+          <span class="ev-key">Server Realm</span>
           <span class="ev-val mono">${sStart} – ${sEnd}</span>
         </div>
         <div class="ev-row">
-          <span class="ev-key">Your Time</span>
+          <span class="ev-key">Your Realm</span>
           <span class="ev-val mono">${lStart} – ${lEnd} ${dayBadge}</span>
         </div>
         <div class="ev-row">
-          <span class="ev-key">${occ.live ? 'Ends In' : 'Starts In'}</span>
+          <span class="ev-key">${occ.live ? '⚔️ Battle Ends' : '⏳ Battle Begins'}</span>
           <span class="ev-val ev-countdown${occ.live ? ' ev-cd-live' : ''}" data-target="${cdTarget}">${fmtCountdown(cdMs)}</span>
         </div>
       </div>

@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ROX Next Gen — Event Tracker</title>
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/events-theme.css">
 </head>
-<body>
+<body class="events-page">
 
 <header>
   <button id="themeBtn" onclick="toggleTheme()">☀️ Light</button>
@@ -23,42 +24,42 @@
 
 <main>
 
-  <!-- Alert Sound -->
+  <!-- Battle Horn -->
   <div class="card alert-bar">
     <div class="alert-bar-inner">
       <div class="alert-bar-info">
-        <span class="alert-icon">🔔</span>
+        <span class="alert-icon">📯</span>
         <div>
-          <div class="alert-bar-title">Event Alert Sound</div>
-          <div class="alert-bar-sub">Plays automatically when an event goes live. Browser must have been interacted with first.</div>
+          <div class="alert-bar-title">Battle Horn</div>
+          <div class="alert-bar-sub">Sounds the horn the moment a battle begins. Interact with the page at least once to unlock auto-play.</div>
         </div>
       </div>
       <button class="alert-preview-btn" onclick="previewSound()">▶ Preview Sound</button>
     </div>
   </div>
 
-  <!-- Live Clocks -->
+  <!-- Realm Clocks -->
   <div class="card">
-    <div class="card-title">🕐 Live Clocks</div>
+    <div class="card-title">⏳ Realm Clocks</div>
     <div class="clocks-row">
       <div class="clock-card">
-        <div class="clock-label">Server Time <span class="tz-pill">Europe / Berlin</span></div>
+        <div class="clock-label">Server Realm <span class="tz-pill">Europe / Berlin</span></div>
         <div class="clock-time" id="clockServer">--:--:--</div>
         <div class="clock-date" id="dateServer">—</div>
       </div>
-      <div class="clock-sep">↔</div>
+      <div class="clock-sep">⚔</div>
       <div class="clock-card">
-        <div class="clock-label">Your Local Time <span class="tz-pill" id="localTzLabel">detecting…</span></div>
+        <div class="clock-label">Your Realm <span class="tz-pill" id="localTzLabel">detecting…</span></div>
         <div class="clock-time" id="clockLocal">--:--:--</div>
         <div class="clock-date" id="dateLocal">—</div>
       </div>
     </div>
   </div>
 
-  <!-- Event Cards -->
+  <!-- Quest Board -->
   <div class="card">
-    <div class="card-title">📅 Event Schedule</div>
-    <div id="eventCards"><p class="empty">Loading…</p></div>
+    <div class="card-title">📜 Quest Board</div>
+    <div id="eventCards"><p class="empty">Loading quests…</p></div>
   </div>
 
 </main>
