@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROX Next Gen — Event Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <button id="themeBtn" onclick="toggleTheme()">☀️ Light</button>
+  <h1>ROX NEXT GENERATION</h1>
+  <p class="hdr-sub">Event Tracker &amp; Time Converter</p>
+  <p class="hdr-credits">by <strong>Kyoshio</strong> &mdash; 1002 فرعون</p>
+</header>
+
+<nav class="page-nav">
+  <a href="index.html"      class="nav-link">⚗️ Enchant Calculator</a>
+  <a href="gold-items.html" class="nav-link">💰 Gold Item Advisor</a>
+  <a href="events.html"     class="nav-link active">🗓️ Event Tracker</a>
+</nav>
+
+<main>
+
+  <!-- Live Clocks -->
+  <div class="card">
+    <div class="card-title">🕐 Live Clocks</div>
+    <div class="clocks-row">
+      <div class="clock-card">
+        <div class="clock-label">Server Time <span class="tz-pill">Europe / Berlin</span></div>
+        <div class="clock-time" id="clockServer">--:--:--</div>
+        <div class="clock-date" id="dateServer">—</div>
+      </div>
+      <div class="clock-sep">↔</div>
+      <div class="clock-card">
+        <div class="clock-label">Your Local Time <span class="tz-pill" id="localTzLabel">detecting…</span></div>
+        <div class="clock-time" id="clockLocal">--:--:--</div>
+        <div class="clock-date" id="dateLocal">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Cards -->
+  <div class="card">
+    <div class="card-title">📅 Event Schedule</div>
+    <div id="eventCards"><p class="empty">Loading…</p></div>
+  </div>
+
+</main>
+
+<footer style="max-width:1320px;margin:0 auto 2rem;padding:1.2rem 1.5rem 0;font-size:.72rem;color:var(--muted);line-height:1.75;border-top:1px solid var(--border)">
+  <p style="margin-bottom:.35rem;font-weight:700;color:var(--text);font-size:.74rem;text-transform:uppercase;letter-spacing:.08em">Disclaimer</p>
+  <p>This tool is an independent, fan-made calculator and is <strong>not affiliated with, endorsed by, or associated with Gravity Co., Ltd.</strong>, Gravity Game Hub, or any of their subsidiaries or partners. <em>ROX: Next Generation</em> and all related names, characters, and game content are trademarks and intellectual property of Gravity Co., Ltd. All game data is derived from publicly observable in-game information for non-commercial, informational purposes only.</p>
+  <p style="margin-top:.45rem">Event times are sourced from community observation and may vary. The author assumes no responsibility for decisions made based on this tool.</p>
+  <p style="margin-top:.75rem;color:var(--border);font-size:.67rem">&copy; 2026 Kyoshio &mdash; 1002 فرعون &nbsp;|&nbsp; Not affiliated with Gravity Co., Ltd.</p>
+</footer>
+
+<script src="shared.js"></script>
+<script src="events.js"></script>
+</body>
+</html>

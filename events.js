@@ -1,0 +1,239 @@
+'use strict';
+
+// ── Config ────────────────────────────────────────────────────────────────────
+const SERVER_TZ = 'Europe/Berlin';
+const LOCAL_TZ  = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+// ── Event Definitions ─────────────────────────────────────────────────────────
+// days: array of 0-6 (0=Sun … 6=Sat), null = every day
+// durationMin: event window length in minutes
+const EVENTS = [
+  {
+    id: 'gvg',
+    name: 'Guild War',
+    tag:  'GVG',
+    icon: '⚔️',
+    schedule: 'Every Saturday',
+    days: [6],
+    startH: 21, startM: 0,
+    durationMin: 60,
+  },
+  {
+    id: 'arcade',
+    name: 'Abyssal Arcade',
+    tag:  '',
+    icon: '🌀',
+    schedule: 'Wed & Fri',
+    days: [3, 5],
+    startH: 20, startM: 0,
+    durationMin: 60,
+  },
+  {
+    id: 'kvm',
+    name: 'KVM',
+    tag:  '',
+    icon: '🏟️',
+    schedule: 'Every Day',
+    days: null,
+    startH: 20, startM: 30,
+    durationMin: 60,
+  },
+];
+
+// ── Timezone Math ─────────────────────────────────────────────────────────────
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+// Returns offset in minutes where local = UTC + offset.
+// Example: Europe/Berlin in winter → +60, in summer (DST) → +120.
+function tzOffsetMin(date, tz) {
+  const p = {};
+  new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    year: 'numeric', month: 'numeric', day: 'numeric',
+    hour: 'numeric', minute: 'numeric', second: 'numeric',
+    hour12: false,
+  }).formatToParts(date).forEach(x => { if (x.type !== 'literal') p[x.type] = x.value; });
+
+  let h = +p.hour;
+  if (h === 24) h = 0;  // Intl quirk: midnight may be reported as 24
+  const wallAsUTC = Date.UTC(+p.year, +p.month - 1, +p.day, h, +p.minute, +p.second);
+  return (wallAsUTC - date.getTime()) / 60000;
+}
+
+// Convert a server-TZ wall-clock time to a real UTC Date.
+// Probes the offset at noon of that calendar day (no DST ambiguity at noon).
+function serverWallToDate(year, month, day, hour, minute) {
+  const noon   = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+  const offset = tzOffsetMin(noon, SERVER_TZ);          // e.g. +60 or +120
+  const wallMs = Date.UTC(year, month - 1, day, hour, minute, 0);
+  return new Date(wallMs - offset * 60000);             // UTC = wall − offset
+}
+
+// Get date components (year, month, day, dow) as seen in the server timezone.
+function serverDateParts(date) {
+  const p = {};
+  new Intl.DateTimeFormat('en-US', {
+    timeZone: SERVER_TZ,
+    year: 'numeric', month: 'numeric', day: 'numeric',
+    weekday: 'short',
+    hour12: false,
+  }).formatToParts(date).forEach(x => { if (x.type !== 'literal') p[x.type] = x.value; });
+
+  const DOW = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  return {
+    year:  +p.year,
+    month: +p.month,
+    day:   +p.day,
+    dow:   DOW[p.weekday],
+  };
+}
+
+// Find the next occurrence of an event relative to `now`.
+// Returns { start: Date, end: Date, live: bool } or null.
+function nextOccurrence(ev, now) {
+  for (let d = 0; d <= 7; d++) {
+    const probe = new Date(now.getTime() + d * 86400000);
+    const sp    = serverDateParts(probe);
+
+    if (ev.days !== null && !ev.days.includes(sp.dow)) continue;
+
+    const start = serverWallToDate(sp.year, sp.month, sp.day, ev.startH, ev.startM);
+    const end   = new Date(start.getTime() + ev.durationMin * 60000);
+
+    if (now < end) return { start, end, live: now >= start };
+  }
+  return null;
+}
+
+// ── Formatting ────────────────────────────────────────────────────────────────
+
+const fmtHM = (d, tz) =>
+  new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(d);
+
+const fmtHMS = (d, tz) =>
+  new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(d);
+
+const fmtWeekday = (d, tz) =>
+  new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long' }).format(d);
+
+const fmtDate = (d, tz) =>
+  new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long', month: 'short', day: 'numeric' }).format(d);
+
+function fmtCountdown(ms) {
+  if (ms <= 0) return '0s';
+  const s = Math.floor(ms / 1000) % 60;
+  const m = Math.floor(ms / 60000) % 60;
+  const h = Math.floor(ms / 3600000) % 24;
+  const d = Math.floor(ms / 86400000);
+  if (d > 0) return `${d}d ${h}h ${pad(m)}m`;
+  if (h > 0) return `${h}h ${pad(m)}m`;
+  return `${m}m ${pad(s)}s`;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+let _lastLive = {};
+
+function renderCards(now) {
+  const container = document.getElementById('eventCards');
+  if (!container) return;
+
+  let html = '<div class="ev-grid">';
+
+  for (const ev of EVENTS) {
+    const occ = nextOccurrence(ev, now);
+    if (!occ) continue;
+
+    _lastLive[ev.id] = occ.live;
+
+    const sStart = fmtHM(occ.start, SERVER_TZ);
+    const sEnd   = fmtHM(occ.end,   SERVER_TZ);
+    const lStart = fmtHM(occ.start, LOCAL_TZ);
+    const lEnd   = fmtHM(occ.end,   LOCAL_TZ);
+
+    // Show a day-shift badge if local weekday differs from server weekday
+    const sDay = fmtWeekday(occ.start, SERVER_TZ);
+    const lDay = fmtWeekday(occ.start, LOCAL_TZ);
+    const dayBadge = lDay !== sDay
+      ? `<span class="ev-daynote">${lDay.slice(0, 3)}</span>`
+      : '';
+
+    const cdTarget = occ.live ? occ.end.getTime() : occ.start.getTime();
+    const cdMs     = cdTarget - now.getTime();
+
+    html += `
+    <div class="ev-card${occ.live ? ' ev-live' : ''}">
+      <div class="ev-header">
+        <span class="ev-icon">${ev.icon}</span>
+        <div class="ev-title">
+          <span class="ev-name">${ev.name}</span>
+          ${ev.tag ? `<span class="ev-tag">${ev.tag}</span>` : ''}
+        </div>
+        ${occ.live ? '<span class="live-pill"><span class="live-dot"></span>LIVE</span>' : ''}
+      </div>
+      <div class="ev-rows">
+        <div class="ev-row">
+          <span class="ev-key">Schedule</span>
+          <span class="ev-val">${ev.schedule}</span>
+        </div>
+        <div class="ev-row">
+          <span class="ev-key">Server Time</span>
+          <span class="ev-val mono">${sStart} – ${sEnd}</span>
+        </div>
+        <div class="ev-row">
+          <span class="ev-key">Your Time</span>
+          <span class="ev-val mono">${lStart} – ${lEnd} ${dayBadge}</span>
+        </div>
+        <div class="ev-row">
+          <span class="ev-key">${occ.live ? 'Ends In' : 'Starts In'}</span>
+          <span class="ev-val ev-countdown${occ.live ? ' ev-cd-live' : ''}" data-target="${cdTarget}">${fmtCountdown(cdMs)}</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ── Tick ──────────────────────────────────────────────────────────────────────
+function tick() {
+  const now = new Date();
+
+  // Update clocks
+  const cs = document.getElementById('clockServer');
+  const ds = document.getElementById('dateServer');
+  const cl = document.getElementById('clockLocal');
+  const dl = document.getElementById('dateLocal');
+  if (cs) cs.textContent = fmtHMS(now, SERVER_TZ);
+  if (ds) ds.textContent = fmtDate(now, SERVER_TZ);
+  if (cl) cl.textContent = fmtHMS(now, LOCAL_TZ);
+  if (dl) dl.textContent = fmtDate(now, LOCAL_TZ);
+
+  // Check if any live state changed → full re-render
+  for (const ev of EVENTS) {
+    const occ  = nextOccurrence(ev, now);
+    const live = occ?.live ?? false;
+    if (_lastLive[ev.id] !== live) {
+      renderCards(now);
+      return;
+    }
+  }
+
+  // Update countdowns in-place (no DOM rebuild)
+  document.querySelectorAll('.ev-countdown[data-target]').forEach(el => {
+    const ms = +el.dataset.target - now.getTime();
+    if (ms <= 0) { renderCards(now); return; }
+    el.textContent = fmtCountdown(ms);
+  });
+}
+
+// ── Bootstrap ─────────────────────────────────────────────────────────────────
+loadTheme();
+
+const tzLabel = document.getElementById('localTzLabel');
+if (tzLabel) tzLabel.textContent = LOCAL_TZ.replace(/_/g, '\u202F');  // narrow no-break space
+
+renderCards(new Date());
+tick();
+setInterval(tick, 1000);
