@@ -21,20 +21,64 @@ body.light {
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;transition:background .2s,color .2s}
 
 /* ── Header ───────────────────────────────────────────────────────────────── */
-header{background:linear-gradient(160deg,#0c0820 0%,#140d28 60%,#0c0614 100%);border-bottom:2px solid var(--gold-dim);padding:1.5rem 2rem;text-align:center;position:relative;box-shadow:0 2px 40px rgba(0,0,0,.6)}
-header h1{font-family:'Cinzel',serif;font-size:1.75rem;font-weight:900;letter-spacing:3px;color:var(--gold);text-shadow:0 0 40px var(--gold-glow),0 2px 4px rgba(0,0,0,.8)}
-.hdr-sub{color:rgba(200,185,255,.55);margin-top:.3rem;font-size:.85rem;letter-spacing:1px}
-.hdr-credits{color:var(--gold-dim);margin-top:.55rem;font-size:.78rem}
-.hdr-credits strong{color:var(--gold)}
-#themeBtn{position:absolute;top:1rem;right:1.2rem;background:rgba(232,192,80,.08);border:1px solid var(--gold-dim);border-radius:8px;color:var(--gold);font-size:.78rem;font-weight:600;padding:.4rem .85rem;cursor:pointer;transition:all .15s}
-#themeBtn:hover{background:rgba(232,192,80,.16);border-color:var(--gold)}
+header{
+  background:
+    radial-gradient(ellipse 80% 150% at 50% -10%, rgba(119,85,204,.22) 0%, transparent 58%),
+    radial-gradient(ellipse 40% 80% at 8%  120%, rgba(232,192,80,.06) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 80% at 92% 120%, rgba(217,68,34,.05)  0%, transparent 55%),
+    radial-gradient(rgba(232,192,80,.055) 1px, transparent 1px),
+    linear-gradient(160deg, #0c0820 0%, #140d28 55%, #0a061a 100%);
+  background-size: auto, auto, auto, 28px 28px, auto;
+  border-bottom: 1px solid var(--gold-dim);
+  padding: 2rem 5rem 1.75rem;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 48px rgba(0,0,0,.7), 0 1px 0 rgba(232,192,80,.08);
+}
+header > *{position:relative;z-index:1}
 
-/* Light header — warm parchment scroll feel */
-body.light header{background:linear-gradient(160deg,#2a1a08 0%,#3d2610 60%,#1e1006 100%);border-bottom-color:#8b6914;box-shadow:0 2px 28px rgba(0,0,0,.4)}
-body.light header h1{color:#e8c050;text-shadow:0 0 24px rgba(232,192,80,.35)}
-body.light .hdr-sub{color:rgba(220,190,130,.6)}
-body.light .hdr-credits{color:#c8a040}
+/* Corner rune marks */
+.hdr-corner{position:absolute;color:var(--gold);font-size:.65rem;opacity:.45;z-index:2;line-height:1;pointer-events:none;user-select:none}
+.hdr-tl{top:.85rem;left:1rem}
+.hdr-bl{bottom:.85rem;left:1rem}
+.hdr-br{bottom:.85rem;right:1rem}
+
+/* Ornament dividers */
+.hdr-deco{display:flex;align-items:center;gap:.55rem;max-width:560px;margin:.45rem auto}
+.hdr-deco-sm{max-width:300px;margin:.3rem auto}
+.hdr-deco-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(232,192,80,.5),transparent)}
+.hdr-deco-gem{color:var(--gold);font-size:.72rem;opacity:.72;flex:0 0 auto;line-height:1}
+.hdr-deco-dot{color:rgba(232,192,80,.38);font-size:.5rem;flex:0 0 auto;line-height:1}
+
+/* Title row */
+.hdr-title-wrap{display:flex;align-items:center;justify-content:center;gap:.9rem;margin:.3rem 0 .25rem}
+.hdr-emblem{font-size:1.5rem;flex:0 0 auto;filter:drop-shadow(0 0 10px rgba(232,192,80,.5));opacity:.8;line-height:1}
+
+header h1{font-family:'Cinzel',serif;font-size:2.1rem;font-weight:900;letter-spacing:5px;color:var(--gold);text-shadow:0 0 50px var(--gold-glow),0 0 100px rgba(232,192,80,.08),0 2px 6px rgba(0,0,0,.9);line-height:1.2}
+.hdr-sub{font-family:'Cinzel',serif;font-size:.74rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,185,255,.65);margin-top:.05rem}
+.hdr-credits{color:rgba(232,192,80,.42);margin-top:.1rem;font-size:.73rem}
+.hdr-credits strong{color:var(--gold);font-weight:700}
+.hdr-guild-tag{display:inline-block;border:1px solid rgba(232,192,80,.2);border-radius:999px;padding:.06rem .5rem;font-size:.68rem;color:rgba(232,192,80,.65);letter-spacing:.05em;margin-left:.15rem;vertical-align:middle}
+
+#themeBtn{position:absolute;top:1rem;right:1.2rem;background:rgba(232,192,80,.08);border:1px solid var(--gold-dim);border-radius:8px;color:var(--gold);font-size:.78rem;font-weight:600;padding:.4rem .85rem;cursor:pointer;transition:all .15s;z-index:2}
+#themeBtn:hover{background:rgba(232,192,80,.16);border-color:var(--gold);box-shadow:0 0 12px var(--gold-glow)}
+
+/* Light header — dark wood scroll feel so gold always pops */
+body.light header{
+  background:
+    radial-gradient(ellipse 80% 140% at 50% -10%, rgba(80,40,0,.32) 0%, transparent 60%),
+    radial-gradient(rgba(139,105,20,.04) 1px, transparent 1px),
+    linear-gradient(160deg, #2a1a08 0%, #3d2610 55%, #1e1006 100%);
+  background-size: auto, 28px 28px, auto;
+  border-bottom-color: #8b6914;
+  box-shadow: 0 4px 32px rgba(0,0,0,.5);
+}
+body.light header h1{color:#e8c050;text-shadow:0 0 28px rgba(232,192,80,.4),0 2px 4px rgba(0,0,0,.8)}
+body.light .hdr-sub{color:rgba(220,190,130,.65)}
+body.light .hdr-credits{color:rgba(200,150,60,.5)}
 body.light .hdr-credits strong{color:#e8c050}
+body.light .hdr-guild-tag{border-color:rgba(232,192,80,.22);color:rgba(200,150,60,.7)}
+body.light .hdr-corner{opacity:.3}
 body.light #themeBtn{background:rgba(232,192,80,.12);border-color:#8b6914;color:#e8c050}
 body.light #themeBtn:hover{background:rgba(232,192,80,.22)}
 
@@ -258,8 +302,12 @@ select:focus{outline:none;border-color:var(--gold)}
 }
 @media(max-width:600px){
   main{padding:1rem}
-  header{padding:1.2rem 1rem}
-  header h1{font-size:1.3rem;letter-spacing:2px}
+  header{padding:1.5rem 1rem 1.25rem}
+  header h1{font-size:1.35rem;letter-spacing:2.5px}
+  .hdr-title-wrap{gap:.5rem}
+  .hdr-emblem{font-size:1.1rem}
+  .hdr-deco{max-width:260px}
+  .hdr-deco-sm{max-width:200px}
   #themeBtn{top:.7rem;right:.7rem;font-size:.7rem;padding:.3rem .6rem}
   .summary-grid{grid-template-columns:repeat(auto-fill,minmax(98px,1fr))}
   .mix-cost{font-size:1.5rem}
