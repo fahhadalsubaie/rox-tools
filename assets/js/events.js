@@ -215,6 +215,62 @@ function renderCards(now) {
   container.innerHTML = html;
 }
 
+// ── Up Next ───────────────────────────────────────────────────────────────────
+function renderUpNext(now) {
+  const container = document.getElementById('upNextCard');
+  if (!container) return;
+
+  // Pick the soonest event that hasn't started yet
+  const next = EVENTS
+    .map(ev => {
+      const occ = nextOccurrence(ev, now);
+      return occ && !occ.live ? { ev, occ } : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.occ.start - b.occ.start)[0];
+
+  if (!next) {
+    container.innerHTML = '<p class="empty">All events are currently active.</p>';
+    return;
+  }
+
+  const { ev, occ } = next;
+  const cdMs   = occ.start - now;
+  const sStart = fmtHM(occ.start, SERVER_TZ);
+  const sEnd   = fmtHM(occ.end,   SERVER_TZ);
+  const lStart = fmtHM(occ.start, LOCAL_TZ);
+  const lEnd   = fmtHM(occ.end,   LOCAL_TZ);
+  const sDay   = fmtDay(occ.start, SERVER_TZ);
+  const lDay   = fmtDay(occ.start, LOCAL_TZ);
+  const dayBadge = lDay !== sDay
+    ? `<span class="ev-daynote">${lDay.slice(0, 3)}</span>` : '';
+
+  container.innerHTML = `
+    <div class="upnext-inner">
+      <div class="upnext-identity">
+        <div class="upnext-icon">${ev.icon}</div>
+        <div class="upnext-name">${ev.name}${ev.tag ? ` <span class="ev-tag">${ev.tag}</span>` : ''}</div>
+        <div class="upnext-schedule">${ev.schedule}</div>
+      </div>
+      <span class="upnext-sep"></span>
+      <div class="upnext-center">
+        <div class="upnext-countdown" data-target="${occ.start.getTime()}">${fmtCountdown(cdMs)}</div>
+        <div class="upnext-label">until battle begins</div>
+      </div>
+      <span class="upnext-sep"></span>
+      <div class="upnext-times">
+        <div class="upnext-time-row">
+          <span class="upnext-tz">Server</span>
+          <span class="upnext-time mono">${sStart} – ${sEnd}</span>
+        </div>
+        <div class="upnext-time-row">
+          <span class="upnext-tz">Your Realm</span>
+          <span class="upnext-time mono">${lStart} – ${lEnd} ${dayBadge}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
 // ── Tick ──────────────────────────────────────────────────────────────────────
 function tick() {
   const now = new Date();
@@ -235,16 +291,28 @@ function tick() {
     const live = occ?.live ?? false;
     if (_prevLive[ev.id] !== live) {
       renderCards(now);
+      renderUpNext(now);
       return;
     }
   }
 
   // Otherwise update countdowns in-place (no DOM rebuild)
+  let needsRebuild = false;
+
   document.querySelectorAll('.ev-countdown[data-target]').forEach(el => {
     const ms = +el.dataset.target - now.getTime();
-    if (ms <= 0) { renderCards(now); return; }
+    if (ms <= 0) { needsRebuild = true; return; }
     el.textContent = fmtCountdown(ms);
   });
+
+  const upNextEl = document.querySelector('.upnext-countdown[data-target]');
+  if (upNextEl) {
+    const ms = +upNextEl.dataset.target - now.getTime();
+    if (ms <= 0) { needsRebuild = true; }
+    else { upNextEl.textContent = fmtCountdown(ms); }
+  }
+
+  if (needsRebuild) { renderCards(now); renderUpNext(now); }
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
@@ -261,5 +329,6 @@ EVENTS.forEach(ev => {
 });
 
 renderCards(_seedNow);
+renderUpNext(_seedNow);
 tick();
 setInterval(tick, 1000);

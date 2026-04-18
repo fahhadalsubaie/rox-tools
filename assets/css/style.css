@@ -264,6 +264,21 @@ select:focus{outline:none;border-color:var(--gold)}
 .alert-preview-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.78rem;font-weight:700;padding:.45rem 1rem;cursor:pointer;transition:all .15s;white-space:nowrap;flex:0 0 auto;min-width:140px;text-align:center}
 .alert-preview-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
 
+/* Up Next banner */
+.upnext-inner{display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap}
+.upnext-sep{width:1px;background:var(--border);align-self:stretch;flex:0 0 auto}
+.upnext-identity{flex:0 0 auto;display:flex;flex-direction:column;gap:.3rem;min-width:130px}
+.upnext-icon{font-size:2.4rem;line-height:1}
+.upnext-name{font-size:.95rem;font-weight:800;color:var(--text)}
+.upnext-schedule{font-size:.72rem;color:var(--muted)}
+.upnext-center{flex:1;text-align:center;padding:0 .5rem;min-width:150px}
+.upnext-countdown{font-size:2.2rem;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.1}
+.upnext-label{font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-top:.25rem}
+.upnext-times{flex:0 0 auto;min-width:190px;display:flex;flex-direction:column;gap:.45rem}
+.upnext-time-row{display:flex;align-items:baseline;gap:.55rem;flex-wrap:wrap}
+.upnext-tz{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);min-width:68px;flex-shrink:0}
+.upnext-time{font-size:.84rem;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+
 /* Event grid — auto-fit + justify-content:center keeps cards centered */
 .ev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,360px));gap:1rem;justify-content:center}
 .ev-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.3rem;display:flex;flex-direction:column;gap:.9rem;transition:border-color .2s,box-shadow .2s}

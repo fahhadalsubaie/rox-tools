@@ -139,6 +139,53 @@ body.events-page .clock-sep {
   opacity: .6;
 }
 
+/* ── Up Next card ────────────────────────────────────────────────────────── */
+body.events-page .upnext-sep {
+  background: var(--border);
+}
+body.events-page .upnext-icon {
+  font-size: 2.8rem !important;
+  filter: drop-shadow(0 0 10px rgba(232,192,80,.4));
+}
+body.events-page .upnext-name {
+  font-family: 'Cinzel', serif !important;
+  font-size: 1rem !important;
+  color: var(--gold) !important;
+  text-shadow: 0 0 14px var(--gold-glow);
+  letter-spacing: .04em;
+}
+body.events-page .upnext-schedule {
+  color: rgba(200,185,255,.5) !important;
+}
+body.events-page .upnext-countdown {
+  font-family: 'Cinzel', serif !important;
+  font-size: 2.4rem !important;
+  color: var(--gold) !important;
+  text-shadow: 0 0 36px var(--gold-glow), 0 0 70px rgba(232,192,80,.08);
+  letter-spacing: .04em;
+}
+body.events-page .upnext-label {
+  font-family: 'Cinzel', serif;
+  color: rgba(200,185,255,.5) !important;
+  letter-spacing: .14em;
+}
+body.events-page .upnext-tz {
+  font-family: 'Cinzel', serif;
+  color: rgba(232,192,80,.45) !important;
+}
+body.events-page .upnext-time {
+  color: rgba(210,200,255,.8) !important;
+}
+
+/* Light mode — Up Next */
+body.light.events-page .upnext-icon { filter: none !important; }
+body.light.events-page .upnext-name { color: var(--gold) !important; text-shadow: none !important; }
+body.light.events-page .upnext-schedule { color: var(--muted) !important; }
+body.light.events-page .upnext-countdown { color: var(--gold) !important; text-shadow: none !important; }
+body.light.events-page .upnext-label { color: var(--muted) !important; }
+body.light.events-page .upnext-tz { color: var(--muted) !important; }
+body.light.events-page .upnext-time { color: var(--text) !important; }
+
 /* ── Quest / Event Cards ─────────────────────────────────────────────────── */
 body.events-page .ev-card {
   background: linear-gradient(160deg, #18102e 0%, #0e0a1a 100%) !important;
