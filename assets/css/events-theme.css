@@ -262,3 +262,144 @@ body.events-page .nav-link.active {
     font-size: 2rem !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Light-mode overrides — body.light.events-page
+   Matches the warm parchment feel of index / gold-items in light mode.
+   All !important flags are needed to beat the dark overrides above.
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* Hide atmospheric glow blobs — they're invisible on parchment anyway */
+body.light.events-page main::before,
+body.light.events-page main::after { display: none; }
+
+/* Cards — parchment surface instead of dark gradient */
+body.light.events-page .card {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 4px 16px rgba(100,60,0,.08), inset 0 1px 0 rgba(139,105,20,.1) !important;
+}
+body.light.events-page .card::before {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,.25), transparent) !important;
+}
+
+/* Alert bar */
+body.light.events-page .alert-bar {
+  border-left-color: var(--gold) !important;
+}
+body.light.events-page .alert-bar-title {
+  color: var(--gold) !important;
+}
+body.light.events-page .alert-bar-sub {
+  color: var(--muted) !important;
+}
+body.light.events-page .alert-preview-btn {
+  background: rgba(139,105,20,.07) !important;
+  border-color: var(--gold-dim) !important;
+  color: var(--gold) !important;
+}
+body.light.events-page .alert-preview-btn:hover {
+  background: rgba(139,105,20,.14) !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 10px var(--gold-glow) !important;
+}
+
+/* Realm Clocks */
+body.light.events-page .clock-card {
+  background: var(--surface2) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 3px 16px rgba(100,60,0,.1) !important;
+}
+body.light.events-page .clock-card::after {
+  color: var(--gold-dim) !important;
+}
+body.light.events-page .clock-label {
+  color: var(--muted) !important;
+}
+body.light.events-page .tz-pill {
+  background: rgba(139,105,20,.08) !important;
+  border-color: var(--border) !important;
+  color: var(--muted) !important;
+}
+body.light.events-page .clock-time {
+  color: var(--gold) !important;
+  text-shadow: 0 0 16px var(--gold-glow) !important;
+}
+body.light.events-page .clock-date {
+  color: var(--muted) !important;
+}
+body.light.events-page .clock-sep {
+  color: var(--border) !important;
+}
+
+/* Event cards */
+body.light.events-page .ev-card {
+  background: var(--bg) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 3px 12px rgba(100,60,0,.08) !important;
+}
+body.light.events-page .ev-card::before {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,.2), transparent) !important;
+}
+body.light.events-page .ev-card.ev-live {
+  border-color: #b83010 !important;
+  box-shadow:
+    0 0 20px rgba(184,48,16,.18),
+    0 0 0 1px rgba(184,48,16,.25),
+    0 3px 12px rgba(100,60,0,.08) !important;
+}
+
+body.light.events-page .ev-icon {
+  filter: none !important;
+}
+body.light.events-page .ev-name {
+  color: var(--gold) !important;
+  text-shadow: none !important;
+}
+body.light.events-page .ev-tag {
+  background: rgba(139,105,20,.08) !important;
+  border-color: var(--border) !important;
+  color: var(--muted) !important;
+}
+
+/* Live pill */
+body.light.events-page .live-pill {
+  background: rgba(184,48,16,.1) !important;
+  color: #b83010 !important;
+  border-color: rgba(184,48,16,.35) !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+body.light.events-page .live-dot {
+  background: #b83010 !important;
+  box-shadow: none !important;
+}
+
+/* Row content */
+body.light.events-page .ev-row {
+  border-bottom-color: var(--divider) !important;
+}
+body.light.events-page .ev-row:last-child {
+  border-top-color: var(--border) !important;
+}
+body.light.events-page .ev-key {
+  color: var(--muted) !important;
+}
+body.light.events-page .ev-val {
+  color: var(--text) !important;
+}
+body.light.events-page .ev-daynote {
+  background: rgba(100,60,0,.08) !important;
+  border-color: var(--border) !important;
+  color: var(--muted) !important;
+}
+
+/* Countdown */
+body.light.events-page .ev-countdown {
+  color: var(--gold) !important;
+  text-shadow: none !important;
+}
+body.light.events-page .ev-cd-live {
+  color: #b83010 !important;
+  text-shadow: none !important;
+}
