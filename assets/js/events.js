@@ -148,6 +148,18 @@ function fmtCountdown(ms) {
   return `${m}m ${pad(s)}s`;
 }
 
+// Always includes seconds — used for the Upcoming Event card
+function fmtCountdownSec(ms) {
+  if (ms <= 0) return '0s';
+  const s = Math.floor(ms / 1000) % 60;
+  const m = Math.floor(ms / 60000) % 60;
+  const h = Math.floor(ms / 3600000) % 24;
+  const d = Math.floor(ms / 86400000);
+  if (d > 0) return `${d}d ${h}h ${pad(m)}m ${pad(s)}s`;
+  if (h > 0) return `${h}h ${pad(m)}m ${pad(s)}s`;
+  return `${m}m ${pad(s)}s`;
+}
+
 // ── Render ────────────────────────────────────────────────────────────────────
 // Track previous live states to detect transitions and fire the alert.
 const _prevLive = {};
@@ -254,8 +266,8 @@ function renderUpNext(now) {
       </div>
       <span class="upnext-sep"></span>
       <div class="upnext-center">
-        <div class="upnext-countdown" data-target="${occ.start.getTime()}">${fmtCountdown(cdMs)}</div>
-        <div class="upnext-label">until battle begins</div>
+        <div class="upnext-countdown" data-target="${occ.start.getTime()}">${fmtCountdownSec(cdMs)}</div>
+        <div class="upnext-label">until ${ev.name} begins</div>
       </div>
       <span class="upnext-sep"></span>
       <div class="upnext-times">
@@ -309,7 +321,7 @@ function tick() {
   if (upNextEl) {
     const ms = +upNextEl.dataset.target - now.getTime();
     if (ms <= 0) { needsRebuild = true; }
-    else { upNextEl.textContent = fmtCountdown(ms); }
+    else { upNextEl.textContent = fmtCountdownSec(ms); }
   }
 
   if (needsRebuild) { renderCards(now); renderUpNext(now); }
