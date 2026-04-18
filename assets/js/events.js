@@ -132,8 +132,8 @@ function nextOccurrence(ev, now) {
 
 // ── Formatting ────────────────────────────────────────────────────────────────
 
-const fmtHM   = (d, tz) => new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(d);
-const fmtHMS  = (d, tz) => new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(d);
+const fmtHM   = (d, tz) => new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(d);
+const fmtHMS  = (d, tz) => new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true }).format(d);
 const fmtDay  = (d, tz) => new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long' }).format(d);
 const fmtDate = (d, tz) => new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long', month: 'short', day: 'numeric' }).format(d);
 
