@@ -1,3 +1,10 @@
+/* Registered custom property — enables smooth conic-gradient animation */
+@property --un-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════════
    Ragnarok Event Tracker Theme
    Scoped entirely to body.events-page — does not affect other pages.
@@ -137,6 +144,48 @@ body.events-page .clock-sep {
   color: var(--gold-dim);
   font-size: 1.4rem;
   opacity: .6;
+}
+
+/* ── Upcoming Event — animated travelling border ─────────────────────────── */
+body.events-page .card-upnext {
+  border: 2px solid transparent !important;
+  background:
+    linear-gradient(160deg, #160e2a 0%, #0e0a1c 100%) padding-box,
+    conic-gradient(
+      from var(--un-angle),
+      transparent        0%,
+      rgba(232,192,80,0) 4%,
+      rgba(232,192,80,.9) 9%,
+      rgba(255,220,100,1) 11%,
+      rgba(232,192,80,.9) 13%,
+      rgba(232,192,80,0) 18%,
+      transparent       100%
+    ) border-box !important;
+  animation: upnext-border-spin 3s linear infinite;
+  box-shadow:
+    0 4px 32px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(232,192,80,.06) !important;
+}
+
+@keyframes upnext-border-spin {
+  to { --un-angle: 360deg; }
+}
+
+/* Light mode — same technique, warm amber streak on parchment card */
+body.light.events-page .card-upnext {
+  background:
+    var(--surface) padding-box,
+    conic-gradient(
+      from var(--un-angle),
+      transparent         0%,
+      rgba(139,105,20,0)  4%,
+      rgba(139,105,20,.85) 9%,
+      rgba(200,160,40,1)  11%,
+      rgba(139,105,20,.85) 13%,
+      rgba(139,105,20,0)  18%,
+      transparent        100%
+    ) border-box !important;
+  box-shadow: 0 3px 16px rgba(100,60,0,.1) !important;
 }
 
 /* ── Up Next card ────────────────────────────────────────────────────────── */
