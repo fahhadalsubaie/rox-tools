@@ -4,9 +4,24 @@
 const SERVER_TZ = 'Europe/Berlin';
 const LOCAL_TZ  = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+// ── Alert Sound ───────────────────────────────────────────────────────────────
+const ALERT = new Audio('assets/sounds/ultra.mp3');
+ALERT.volume = 0.8;
+
+function playAlert() {
+  ALERT.currentTime = 0;
+  ALERT.play().catch(() => {
+    // Autoplay blocked (no prior user interaction) — visual notification still shows
+  });
+}
+
+function previewSound() {
+  ALERT.currentTime = 0;
+  ALERT.play();
+}
+
 // ── Event Definitions ─────────────────────────────────────────────────────────
-// days: array of 0-6 (0=Sun … 6=Sat), null = every day
-// durationMin: event window length in minutes
+// days: 0=Sun … 6=Sat, null = every day
 const EVENTS = [
   {
     id: 'gvg',
@@ -44,8 +59,8 @@ const EVENTS = [
 
 function pad(n) { return String(n).padStart(2, '0'); }
 
-// Returns offset in minutes where local = UTC + offset.
-// Example: Europe/Berlin in winter → +60, in summer (DST) → +120.
+// Returns UTC offset in minutes where local = UTC + offset.
+// Europe/Berlin winter → +60, summer (DST) → +120.
 function tzOffsetMin(date, tz) {
   const p = {};
   new Intl.DateTimeFormat('en-US', {
@@ -56,46 +71,37 @@ function tzOffsetMin(date, tz) {
   }).formatToParts(date).forEach(x => { if (x.type !== 'literal') p[x.type] = x.value; });
 
   let h = +p.hour;
-  if (h === 24) h = 0;  // Intl quirk: midnight may be reported as 24
+  if (h === 24) h = 0;
   const wallAsUTC = Date.UTC(+p.year, +p.month - 1, +p.day, h, +p.minute, +p.second);
   return (wallAsUTC - date.getTime()) / 60000;
 }
 
 // Convert a server-TZ wall-clock time to a real UTC Date.
-// Probes the offset at noon of that calendar day (no DST ambiguity at noon).
+// Probes at noon of that calendar day to avoid DST ambiguity.
 function serverWallToDate(year, month, day, hour, minute) {
   const noon   = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
-  const offset = tzOffsetMin(noon, SERVER_TZ);          // e.g. +60 or +120
+  const offset = tzOffsetMin(noon, SERVER_TZ);      // e.g. +60 or +120
   const wallMs = Date.UTC(year, month - 1, day, hour, minute, 0);
-  return new Date(wallMs - offset * 60000);             // UTC = wall − offset
+  return new Date(wallMs - offset * 60000);          // UTC = wall − offset
 }
 
-// Get date components (year, month, day, dow) as seen in the server timezone.
+// Get date components (year, month, day, dow) as seen in SERVER_TZ.
 function serverDateParts(date) {
   const p = {};
   new Intl.DateTimeFormat('en-US', {
     timeZone: SERVER_TZ,
     year: 'numeric', month: 'numeric', day: 'numeric',
-    weekday: 'short',
-    hour12: false,
+    weekday: 'short', hour12: false,
   }).formatToParts(date).forEach(x => { if (x.type !== 'literal') p[x.type] = x.value; });
 
   const DOW = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-  return {
-    year:  +p.year,
-    month: +p.month,
-    day:   +p.day,
-    dow:   DOW[p.weekday],
-  };
+  return { year: +p.year, month: +p.month, day: +p.day, dow: DOW[p.weekday] };
 }
 
-// Find the next occurrence of an event relative to `now`.
-// Returns { start: Date, end: Date, live: bool } or null.
+// Returns { start, end, live } for the next occurrence of ev, or null.
 function nextOccurrence(ev, now) {
   for (let d = 0; d <= 7; d++) {
-    const probe = new Date(now.getTime() + d * 86400000);
-    const sp    = serverDateParts(probe);
-
+    const sp = serverDateParts(new Date(now.getTime() + d * 86400000));
     if (ev.days !== null && !ev.days.includes(sp.dow)) continue;
 
     const start = serverWallToDate(sp.year, sp.month, sp.day, ev.startH, ev.startM);
@@ -108,17 +114,10 @@ function nextOccurrence(ev, now) {
 
 // ── Formatting ────────────────────────────────────────────────────────────────
 
-const fmtHM = (d, tz) =>
-  new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(d);
-
-const fmtHMS = (d, tz) =>
-  new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(d);
-
-const fmtWeekday = (d, tz) =>
-  new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long' }).format(d);
-
-const fmtDate = (d, tz) =>
-  new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long', month: 'short', day: 'numeric' }).format(d);
+const fmtHM   = (d, tz) => new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(d);
+const fmtHMS  = (d, tz) => new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(d);
+const fmtDay  = (d, tz) => new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long' }).format(d);
+const fmtDate = (d, tz) => new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long', month: 'short', day: 'numeric' }).format(d);
 
 function fmtCountdown(ms) {
   if (ms <= 0) return '0s';
@@ -132,7 +131,8 @@ function fmtCountdown(ms) {
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
-let _lastLive = {};
+// Track previous live states to detect transitions and fire the alert.
+const _prevLive = {};
 
 function renderCards(now) {
   const container = document.getElementById('eventCards');
@@ -144,16 +144,17 @@ function renderCards(now) {
     const occ = nextOccurrence(ev, now);
     if (!occ) continue;
 
-    _lastLive[ev.id] = occ.live;
+    // Fire alert sound on live transition (false → true)
+    if (occ.live && _prevLive[ev.id] === false) playAlert();
+    _prevLive[ev.id] = occ.live;
 
     const sStart = fmtHM(occ.start, SERVER_TZ);
     const sEnd   = fmtHM(occ.end,   SERVER_TZ);
     const lStart = fmtHM(occ.start, LOCAL_TZ);
     const lEnd   = fmtHM(occ.end,   LOCAL_TZ);
 
-    // Show a day-shift badge if local weekday differs from server weekday
-    const sDay = fmtWeekday(occ.start, SERVER_TZ);
-    const lDay = fmtWeekday(occ.start, LOCAL_TZ);
+    const sDay = fmtDay(occ.start, SERVER_TZ);
+    const lDay = fmtDay(occ.start, LOCAL_TZ);
     const dayBadge = lDay !== sDay
       ? `<span class="ev-daynote">${lDay.slice(0, 3)}</span>`
       : '';
@@ -200,7 +201,7 @@ function renderCards(now) {
 function tick() {
   const now = new Date();
 
-  // Update clocks
+  // Clocks
   const cs = document.getElementById('clockServer');
   const ds = document.getElementById('dateServer');
   const cl = document.getElementById('clockLocal');
@@ -210,17 +211,17 @@ function tick() {
   if (cl) cl.textContent = fmtHMS(now, LOCAL_TZ);
   if (dl) dl.textContent = fmtDate(now, LOCAL_TZ);
 
-  // Check if any live state changed → full re-render
+  // Detect live-state changes → full re-render (also fires alert sound)
   for (const ev of EVENTS) {
     const occ  = nextOccurrence(ev, now);
     const live = occ?.live ?? false;
-    if (_lastLive[ev.id] !== live) {
+    if (_prevLive[ev.id] !== live) {
       renderCards(now);
       return;
     }
   }
 
-  // Update countdowns in-place (no DOM rebuild)
+  // Otherwise update countdowns in-place (no DOM rebuild)
   document.querySelectorAll('.ev-countdown[data-target]').forEach(el => {
     const ms = +el.dataset.target - now.getTime();
     if (ms <= 0) { renderCards(now); return; }
@@ -232,8 +233,15 @@ function tick() {
 loadTheme();
 
 const tzLabel = document.getElementById('localTzLabel');
-if (tzLabel) tzLabel.textContent = LOCAL_TZ.replace(/_/g, '\u202F');  // narrow no-break space
+if (tzLabel) tzLabel.textContent = LOCAL_TZ.replace(/_/g, ' ');
 
-renderCards(new Date());
+// Seed _prevLive before first render so we don't fire spurious alerts on load
+const _seedNow = new Date();
+EVENTS.forEach(ev => {
+  const occ = nextOccurrence(ev, _seedNow);
+  _prevLive[ev.id] = occ?.live ?? false;
+});
+
+renderCards(_seedNow);
 tick();
 setInterval(tick, 1000);
