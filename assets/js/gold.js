@@ -88,11 +88,20 @@ function taxBreakdownHTML(brackets, gross, totalTax, panelVisible, toggleFn, cur
     </div>`;
 }
 
+// ── Input Helpers ─────────────────────────────────────────────────────────────
+// Clamp numeric inputs to a safe positive range regardless of DOM manipulation.
+const MAX_INPUT = 100_000_000;
+function safeNum(id) {
+  const v = parseFloat(document.getElementById(id).value);
+  if (!isFinite(v) || v < 0) return 0;
+  return Math.min(v, MAX_INPUT);
+}
+
 // ── Render ────────────────────────────────────────────────────────────────────
 function calculate() {
-  const directPrice  = parseFloat(document.getElementById('directPrice').value)  || 0;
-  const dismantleAmt = parseFloat(document.getElementById('dismantleAmt').value) || 0;
-  const coinPrice    = parseFloat(document.getElementById('coinPrice').value)     || 0;
+  const directPrice  = safeNum('directPrice');
+  const dismantleAmt = safeNum('dismantleAmt');
+  const coinPrice    = safeNum('coinPrice');
   const coinType     = document.getElementById('coinType').value;
 
   const dismantleGross = dismantleAmt * coinPrice;

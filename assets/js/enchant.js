@@ -151,7 +151,8 @@ function mkInput(defaultVal, onChange) {
   if (defaultVal != null) inp.value = defaultVal; else inp.placeholder = '—';
   inp.addEventListener('input', () => {
     const n = parseFloat(inp.value);
-    onChange(inp.value === '' || isNaN(n) ? null : n);
+    if (inp.value === '' || isNaN(n)) { onChange(null); return; }
+    onChange(Math.max(0, Math.min(n, 100_000_000)));
   });
   return inp;
 }

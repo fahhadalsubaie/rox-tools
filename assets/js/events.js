@@ -16,8 +16,26 @@ function playAlert() {
 }
 
 function previewSound() {
+  const btn = document.querySelector('.alert-preview-btn');
+
+  if (!ALERT.paused) {
+    // Currently playing — stop it
+    ALERT.pause();
+    ALERT.currentTime = 0;
+    if (btn) btn.textContent = '▶ Preview Sound';
+    return;
+  }
+
+  // Start playing
   ALERT.currentTime = 0;
-  ALERT.play();
+  ALERT.play().catch(() => {});
+
+  if (btn) btn.textContent = '■ Stop';
+
+  // Reset label when the track ends naturally
+  ALERT.onended = () => {
+    if (btn) btn.textContent = '▶ Preview Sound';
+  };
 }
 
 // ── Event Definitions ─────────────────────────────────────────────────────────
