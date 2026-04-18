@@ -1,16 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&display=swap');
+
 /* ── Theme Variables ──────────────────────────────────────────────────────── */
 :root {
-  --bg:#0d0d18;--surface:#14142a;--surface2:#1c1c36;--border:#2a2a50;
-  --accent:#e94560;--gold:#f5c842;--gold-dim:#a88a20;
+  --bg:#080612;--surface:#120e20;--surface2:#1a1230;--border:#2a1d48;
+  --accent:#e94560;--gold:#e8c050;--gold-dim:#5a3d08;--gold-glow:rgba(232,192,80,.3);
   --green:#4cde8f;--green-dim:#1a5535;
-  --text:#dde0f0;--muted:#6b7099;--warn:#f5a623;
-  --hover:rgba(128,128,255,0.04);--divider:rgba(42,42,80,0.4);
+  --text:#dde0f0;--muted:#7a6da0;--warn:#f5a623;
+  --hover:rgba(119,85,204,0.05);--divider:rgba(42,29,72,0.5);
 }
 body.light {
-  --bg:#f2f3fa;--surface:#fff;--surface2:#e8eaf5;--border:#ced1e8;
-  --gold:#9a6e00;--gold-dim:#7a5500;--green:#1a7a45;--green-dim:#0d5030;
-  --text:#1a1a30;--muted:#7878a0;
-  --hover:rgba(0,0,80,0.03);--divider:rgba(180,180,220,0.5);
+  --bg:#f4eed8;--surface:#fdf8ec;--surface2:#ede6ce;--border:#c8a86a;
+  --gold:#8b6914;--gold-dim:#c8a040;--gold-glow:rgba(139,105,20,.2);
+  --green:#1a7a45;--green-dim:#0d5030;
+  --text:#2a1a08;--muted:#7a6040;
+  --hover:rgba(100,60,0,0.04);--divider:rgba(180,130,80,0.35);
 }
 
 /* ── Reset ────────────────────────────────────────────────────────────────── */
@@ -18,13 +21,22 @@ body.light {
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;transition:background .2s,color .2s}
 
 /* ── Header ───────────────────────────────────────────────────────────────── */
-header{background:linear-gradient(135deg,#0a0a1a,#1c1c3a);border-bottom:2px solid var(--accent);padding:1.5rem 2rem;text-align:center;position:relative}
-header h1{font-size:1.75rem;font-weight:800;letter-spacing:3px;color:#f5c842;text-shadow:0 0 30px rgba(245,200,66,.4)}
-.hdr-sub{color:#8888aa;margin-top:.3rem;font-size:.85rem;letter-spacing:1px}
-.hdr-credits{color:#a88a20;margin-top:.55rem;font-size:.78rem}
-.hdr-credits strong{color:#f5c842}
-#themeBtn{position:absolute;top:1rem;right:1.2rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#ccd;font-size:.78rem;font-weight:600;padding:.4rem .85rem;cursor:pointer;transition:all .15s}
-#themeBtn:hover{background:rgba(255,255,255,.16)}
+header{background:linear-gradient(160deg,#0c0820 0%,#140d28 60%,#0c0614 100%);border-bottom:2px solid var(--gold-dim);padding:1.5rem 2rem;text-align:center;position:relative;box-shadow:0 2px 40px rgba(0,0,0,.6)}
+header h1{font-family:'Cinzel',serif;font-size:1.75rem;font-weight:900;letter-spacing:3px;color:var(--gold);text-shadow:0 0 40px var(--gold-glow),0 2px 4px rgba(0,0,0,.8)}
+.hdr-sub{color:rgba(200,185,255,.55);margin-top:.3rem;font-size:.85rem;letter-spacing:1px}
+.hdr-credits{color:var(--gold-dim);margin-top:.55rem;font-size:.78rem}
+.hdr-credits strong{color:var(--gold)}
+#themeBtn{position:absolute;top:1rem;right:1.2rem;background:rgba(232,192,80,.08);border:1px solid var(--gold-dim);border-radius:8px;color:var(--gold);font-size:.78rem;font-weight:600;padding:.4rem .85rem;cursor:pointer;transition:all .15s}
+#themeBtn:hover{background:rgba(232,192,80,.16);border-color:var(--gold)}
+
+/* Light header — warm parchment scroll feel */
+body.light header{background:linear-gradient(160deg,#2a1a08 0%,#3d2610 60%,#1e1006 100%);border-bottom-color:#8b6914;box-shadow:0 2px 28px rgba(0,0,0,.4)}
+body.light header h1{color:#e8c050;text-shadow:0 0 24px rgba(232,192,80,.35)}
+body.light .hdr-sub{color:rgba(220,190,130,.6)}
+body.light .hdr-credits{color:#c8a040}
+body.light .hdr-credits strong{color:#e8c050}
+body.light #themeBtn{background:rgba(232,192,80,.12);border-color:#8b6914;color:#e8c050}
+body.light #themeBtn:hover{background:rgba(232,192,80,.22)}
 
 /* ── Page Nav ─────────────────────────────────────────────────────────────── */
 .page-nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;justify-content:center;transition:background .2s,border-color .2s}
@@ -35,7 +47,7 @@ header h1{font-size:1.75rem;font-weight:800;letter-spacing:3px;color:#f5c842;tex
 /* ── Layout ───────────────────────────────────────────────────────────────── */
 main{max-width:1320px;margin:0 auto;padding:2rem 1.5rem;display:flex;flex-direction:column;gap:1.5rem}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:background .2s,border-color .2s}
-.card-title{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;padding-bottom:.7rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem}
+.card-title{font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;padding-bottom:.7rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;text-shadow:0 0 14px var(--gold-glow)}
 .saved-pill{font-size:.68rem;color:var(--green);margin-left:.5rem;opacity:0;transition:opacity .3s}
 .saved-pill.show{opacity:1}
 
